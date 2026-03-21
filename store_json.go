@@ -657,3 +657,21 @@ func (rs *JSONStore) ClearLastRaceEvent() error {
 
 	return err
 }
+
+// Track/Car Pools — not implemented in the JSON store (BoltDB only).
+
+func (rs *JSONStore) UpsertTrackCarPool(pool *TrackCarPool) error {
+	return nil
+}
+
+func (rs *JSONStore) LoadTrackCarPool(id string) (*TrackCarPool, error) {
+	return nil, nil
+}
+
+func (rs *JSONStore) ListTrackCarPools() ([]*TrackCarPool, error) {
+	return nil, nil
+}
+
+func (rs *JSONStore) DeleteTrackCarPool(id string) error {
+	return nil
+}

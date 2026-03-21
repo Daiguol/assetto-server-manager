@@ -1,0 +1,245 @@
+{{/* gotype: github.com/JustaPenguin/assetto-server-manager.poolEditTemplateVars */}}
+
+{{ define "title" }}{{ if .IsNew }}New Pool{{ else }}Edit Pool{{ end }}{{ end }}
+
+{{ define "content" }}
+{{ $pool := .Pool }}
+
+<h1 class="text-center">{{ if .IsNew }}New Pool{{ else }}Edit Pool: {{ $pool.Name }}{{ end }}</h1>
+
+<form method="POST" action="{{ if .IsNew }}/pools/new/submit{{ else }}/pool/{{ $pool.ID }}/submit{{ end }}">
+
+    {{/* Pool Name */}}
+    <div class="form-group row">
+        <label for="PoolName" class="col-sm-3 col-form-label">Pool Name</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" id="PoolName" name="PoolName"
+                   value="{{ $pool.Name }}" required placeholder="e.g. GTP, DTM, Super Touring…">
+        </div>
+    </div>
+
+    <hr>
+
+    {{/* ===== CARS ===== */}}
+    <h5>Cars</h5>
+    <p class="text-muted small">Search and select all cars allowed in this pool. Hold Ctrl/Cmd to select multiple.</p>
+
+    <div class="race-setup">
+        {{/* Car search — uses existing CarSearch.ts initialized for .race-setup */}}
+        <div class="row mb-2">
+            <div class="col-8 col-md-10">
+                <input name="q" placeholder="Search for cars…" class="form-control car-search" autocomplete="off">
+            </div>
+            <div class="col-4 col-md-2">
+                <button id="car-search" class="btn btn-primary w-100 car-search-btn" type="button">Search</button>
+            </div>
+        </div>
+
+        <select multiple class="form-control Cars" name="PoolCars" size="12">
+            {{ range .CarOpts }}
+                {{ $carName := .Name }}
+                {{ $selected := false }}
+                {{ range $pool.Cars }}
+                    {{ if eq . $carName }}{{ $selected = true }}{{ end }}
+                {{ end }}
+                <option value="{{ $carName }}"
+                        class="{{ if .IsPaidDLC }}bg-dlc{{ end }}{{ if .IsMod }}bg-mod{{ end }}"
+                        {{ if $selected }}selected="selected"{{ end }}>
+                    {{ prettify $carName true }}
+                </option>
+            {{ end }}
+        </select>
+
+        <div class="mb-3 mt-1">
+            <small>
+                <span class="badge bg-dlc">DLC</span>
+                <span class="badge bg-mod">Mod</span>
+            </small>
+        </div>
+
+        <hr>
+
+        {{/* ===== TRACK PICKER ===== */}}
+        <h5>Add Tracks</h5>
+        <p class="text-muted small">Select a track and layout, give it a display name, then click Add.</p>
+
+        <div class="form-group row">
+            <label for="Track" class="col-sm-3 col-form-label">Track</label>
+            <div class="col-sm-9">
+                <select class="form-control" id="Track">
+                    {{ $split := .TrackOpts.Split }}
+                    {{ with $split.Stock }}
+                        <optgroup label="Stock">
+                            {{ range . }}
+                                <option value="{{ .Name }}">{{ prettify .Name false }}</option>
+                            {{ end }}
+                        </optgroup>
+                    {{ end }}
+                    {{ with $split.DLC }}
+                        <optgroup label="DLC">
+                            {{ range . }}
+                                <option value="{{ .Name }}">{{ prettify .Name false }}</option>
+                            {{ end }}
+                        </optgroup>
+                    {{ end }}
+                    {{ with $split.Mod }}
+                        <optgroup label="Mod">
+                            {{ range . }}
+                                <option value="{{ .Name }}">{{ prettify .Name false }}</option>
+                            {{ end }}
+                        </optgroup>
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+
+        {{/* Layout — hidden by default, shown by existing JS when track has layouts */}}
+        <div class="form-group row" style="display: none;">
+            <label for="TrackLayout" class="col-sm-3 col-form-label">Layout</label>
+            <div class="col-sm-9">
+                <select class="form-control" id="TrackLayout">
+                    {{ range .TrackOpts }}
+                        {{ $trackName := .Name }}
+                        {{ range .Layouts }}
+                            {{ $layoutName := . }}
+                            {{ $displayName := prettify . true }}
+                            {{ $info := trackInfo $trackName $layoutName }}
+                            {{ with $info }}{{ $displayName = .Name }}{{ end }}
+                            <option value="{{ $trackName }}:{{ $layoutName }}" data-track-name="{{ $layoutName }}">{{ $displayName }}</option>
+                        {{ end }}
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="pool-track-display-name" class="col-sm-3 col-form-label">Display Name</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="pool-track-display-name"
+                       placeholder="Auto-filled or enter a custom name">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-sm-9 offset-sm-3">
+                <button type="button" id="pool-add-track-btn" class="btn btn-secondary">
+                    + Add Track to Pool
+                </button>
+            </div>
+        </div>
+    </div>{{/* end .race-setup */}}
+
+    <hr>
+
+    {{/* ===== TRACKS TABLE ===== */}}
+    <h5>Tracks in this Pool <span id="pool-track-count" class="badge badge-secondary">{{ len $pool.Tracks }}</span></h5>
+
+    <table class="table table-sm table-bordered" id="pool-tracks-table">
+        <thead>
+            <tr>
+                <th>Display Name</th>
+                <th>Track ID</th>
+                <th>Layout</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="pool-tracks-body">
+            {{ range $pool.Tracks }}
+                <tr>
+                    <td>{{ .Name }}</td>
+                    <td><code>{{ .Track }}</code></td>
+                    <td><code>{{ .Layout }}</code></td>
+                    <td>
+                        <input type="hidden" name="PoolTrack" value="{{ .Track }}">
+                        <input type="hidden" name="PoolLayout" value="{{ .Layout }}">
+                        <input type="hidden" name="PoolTrackName" value="{{ .Name }}">
+                        <button type="button" class="btn btn-sm btn-danger pool-remove-track">Remove</button>
+                    </td>
+                </tr>
+            {{ end }}
+        </tbody>
+    </table>
+
+    <div class="form-group row mt-4">
+        <div class="col-sm-12">
+            <button type="submit" class="btn btn-primary">Save Pool</button>
+            <a href="/pools" class="btn btn-secondary ml-2">Cancel</a>
+        </div>
+    </div>
+</form>
+
+<script>
+(function () {
+    // --- Add track to pool ---
+    document.getElementById('pool-add-track-btn').addEventListener('click', function () {
+        const trackSelect = document.getElementById('Track');
+        const layoutSelect = document.getElementById('TrackLayout');
+        const nameInput = document.getElementById('pool-track-display-name');
+
+        const trackID = trackSelect.value;
+        if (!trackID) return;
+
+        // The layout dropdown is managed by ACSM JS:
+        // - If visible, its value is "trackID:layoutID"
+        // - If hidden, no layout needed
+        const layoutParent = layoutSelect.closest('.form-group');
+        const isLayoutVisible = layoutParent && layoutParent.style.display !== 'none';
+        let layoutID = '';
+        if (isLayoutVisible && layoutSelect.value) {
+            // value format: "trackID:layoutID"  →  take everything after first ":"
+            const parts = layoutSelect.value.split(':');
+            layoutID = parts.slice(1).join(':');
+        }
+
+        // Auto display name: selected text + layout text
+        let displayName = nameInput.value.trim();
+        if (!displayName) {
+            displayName = trackSelect.options[trackSelect.selectedIndex].text.trim();
+            if (isLayoutVisible && layoutSelect.selectedIndex >= 0) {
+                displayName += ' — ' + layoutSelect.options[layoutSelect.selectedIndex].text.trim();
+            }
+        }
+
+        // Add row to table
+        const tbody = document.getElementById('pool-tracks-body');
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td>' + escapeHtml(displayName) + '</td>' +
+            '<td><code>' + escapeHtml(trackID) + '</code></td>' +
+            '<td><code>' + escapeHtml(layoutID) + '</code></td>' +
+            '<td>' +
+                '<input type="hidden" name="PoolTrack" value="' + escapeHtml(trackID) + '">' +
+                '<input type="hidden" name="PoolLayout" value="' + escapeHtml(layoutID) + '">' +
+                '<input type="hidden" name="PoolTrackName" value="' + escapeHtml(displayName) + '">' +
+                '<button type="button" class="btn btn-sm btn-danger pool-remove-track">Remove</button>' +
+            '</td>';
+        tbody.appendChild(tr);
+        updateCount();
+
+        // Reset name input
+        nameInput.value = '';
+    });
+
+    // --- Remove track row ---
+    document.getElementById('pool-tracks-body').addEventListener('click', function (e) {
+        if (e.target && e.target.classList.contains('pool-remove-track')) {
+            e.target.closest('tr').remove();
+            updateCount();
+        }
+    });
+
+    function updateCount() {
+        document.getElementById('pool-track-count').textContent =
+            document.getElementById('pool-tracks-body').querySelectorAll('tr').length;
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+})();
+</script>
+{{ end }}

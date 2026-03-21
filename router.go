@@ -65,6 +65,7 @@ func Router(
 	healthCheck *HealthCheck,
 	kissMyRankHandler *KissMyRankHandler,
 	realPenaltyHandler *RealPenaltyHandler,
+	poolsHandler *PoolsHandler,
 ) http.Handler {
 	r := chi.NewRouter()
 
@@ -182,6 +183,9 @@ func Router(
 		r.Get("/content/tracks/{track}/ui/ui_track.json", AssetCacheHeaders(http.HandlerFunc(tracksHandler.trackInfo), true))
 		r.Get("/content/tracks/{track}/ui/{layout}/ui_track.json", AssetCacheHeaders(http.HandlerFunc(tracksHandler.trackInfo), true))
 
+		// pools
+		r.Get("/pools", poolsHandler.list)
+
 		// race weekends
 		r.Get("/race-weekends", raceWeekendHandler.list)
 		r.Get("/race-weekend/{raceWeekendID}", raceWeekendHandler.view)
@@ -213,6 +217,7 @@ func Router(
 		r.Post("/quick/submit", quickRaceHandler.submit)
 		r.Get("/custom/new", customRaceHandler.createOrEdit)
 		r.Get("/custom/load/{uuid}", customRaceHandler.start)
+		r.Post("/api/custom/{uuid}/load-track", customRaceHandler.apiLoadTrack)
 		r.Post("/custom/schedule/{uuid}", customRaceHandler.schedule)
 		r.Get("/custom/schedule/{uuid}/remove", customRaceHandler.removeSchedule)
 		r.Get("/custom/edit/{uuid}", customRaceHandler.createOrEdit)
@@ -241,6 +246,8 @@ func Router(
 		r.Get("/championship/{championshipID}/event/{eventID}/cancel", championshipsHandler.cancelEvent)
 		r.Get("/championship/{championshipID}/event/{eventID}/restart", championshipsHandler.restartEvent)
 		r.Get("/championship/{championshipID}/event/{eventID}/duplicate", championshipsHandler.duplicateEvent)
+		r.Get("/championship/{championshipID}/random-events", championshipsHandler.randomEventsConfig)
+		r.Post("/championship/{championshipID}/random-events", championshipsHandler.generateRandomEvents)
 
 		r.Post("/championship/{championshipID}/driver-penalty/{classID}/{driverGUID}", championshipsHandler.driverPenalty)
 		r.Post("/championship/{championshipID}/team-penalty/{classID}/{team}", championshipsHandler.teamPenalty)
@@ -273,6 +280,19 @@ func Router(
 		r.Post("/api/car/upload", contentUploadHandler.upload(ContentTypeCar))
 		r.Post("/api/weather/upload", contentUploadHandler.upload(ContentTypeWeather))
 		r.Post("/api/image-upload", contentUploadHandler.imageUpload)
+
+		// pools
+		r.Get("/api/pools", poolsHandler.apiList)
+		r.Get("/pools/new", poolsHandler.createOrEdit)
+		r.Post("/pools/new/submit", poolsHandler.submit)
+		r.Get("/pool/{poolID}/edit", poolsHandler.createOrEdit)
+		r.Post("/pool/{poolID}/submit", poolsHandler.submit)
+		r.Get("/pool/{poolID}/delete", poolsHandler.delete)
+
+		// championship API
+		r.Get("/api/championships", championshipsHandler.apiListChampionships)
+		r.Get("/api/championship/{championshipID}/events", championshipsHandler.apiChampionshipEvents)
+		r.Post("/api/championship/{championshipID}/event/{eventID}/start", championshipsHandler.apiStartChampionshipEvent)
 
 		// race weekend
 		r.Get("/race-weekends/new", raceWeekendHandler.createOrEdit)

@@ -1,0 +1,53 @@
+{{/* gotype: github.com/JustaPenguin/assetto-server-manager.poolsListTemplateVars */}}
+
+{{ define "title" }}Car/Track Pools{{ end }}
+
+{{ define "content" }}
+    <h1 class="text-center">Car/Track Pools</h1>
+
+    {{ if WriteAccess }}
+        <div class="text-right mb-3">
+            <a href="/pools/new" class="btn btn-primary">New Pool</a>
+        </div>
+    {{ end }}
+
+    {{ if .Pools }}
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Cars</th>
+                    <th>Tracks</th>
+                    <th>Used in</th>
+                    {{ if WriteAccess }}<th>Actions</th>{{ end }}
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Pools }}
+                    <tr>
+                        <td>{{ .Name }}</td>
+                        <td>{{ len .Cars }}</td>
+                        <td>{{ len .Tracks }}</td>
+                        <td>
+                            {{ $usedBy := index $.PoolUsedBy .ID }}
+                            {{ if $usedBy }}
+                                {{ range $i, $name := $usedBy }}{{ if $i }}, {{ end }}<span class="badge badge-info">{{ $name }}</span>{{ end }}
+                            {{ else }}
+                                <span class="text-muted">—</span>
+                            {{ end }}
+                        </td>
+                        {{ if WriteAccess }}
+                            <td>
+                                <a href="/pool/{{ .ID.String }}/edit" class="btn btn-sm btn-warning">Edit</a>
+                                <a href="/pool/{{ .ID.String }}/delete" class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Delete pool {{ .Name }}?')">Delete</a>
+                            </td>
+                        {{ end }}
+                    </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    {{ else }}
+        <p class="text-center text-muted">No pools yet. <a href="/pools/new">Create one</a>.</p>
+    {{ end }}
+{{ end }}

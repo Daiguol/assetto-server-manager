@@ -535,6 +535,11 @@
                 <div class="btn-group">
 
                     <a class="btn btn-success" href="/championship/{{ $championship.ID.String }}/event">Add Events</a>
+                    {{ if $championship.HasPoolClasses }}
+                    <a class="btn btn-warning ml-1" href="/championship/{{ $championship.ID.String }}/random-events">
+                        Random Events
+                    </a>
+                    {{ end }}
 
                     <a href="#" style="min-width: 38px !important;" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="importCustomDropdown" class="btn btn-success btn-sm custom-race-actions-btn-small dropdown-toggle dropdown-toggle-split"
                     ></a>
@@ -576,9 +581,11 @@
                         </a>
                     {{ end }}
 
-                    <a class="dropdown-item" href="/championship/{{ $championship.ID.String }}/export">
-                        Export
-                    </a>
+                    {{ if or (not $championship.SecretCalendar) (ge $championship.Progress 100.0) }}
+                        <a class="dropdown-item" href="/championship/{{ $championship.ID.String }}/export">
+                            Export
+                        </a>
+                    {{ end }}
 
 
                     <a href="/championship/{{ $championship.ID }}/duplicate" class="dropdown-item">Duplicate</a>

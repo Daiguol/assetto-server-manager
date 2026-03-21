@@ -992,6 +992,9 @@ type RaceTemplateVars struct {
 	RaceWeekendHasAtLeastOneSession bool
 
 	ShowOverridePasswordCard bool
+
+	// FormAction overrides the default form action URL when set.
+	FormAction string
 }
 
 // BuildRaceOpts builds a quick race form

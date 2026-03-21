@@ -34,6 +34,16 @@ type ScheduledEvent interface {
 func BuildICalEvent(event ScheduledEvent) *components.Event {
 	icalEvent := components.NewEvent(event.GetID().String(), event.GetScheduledTime().UTC())
 
+	if champEvent, ok := event.(*ChampionshipEvent); ok && champEvent.IsSecret() {
+		icalEvent.Summary = "Secret Event " + event.GetSummary()
+		if config.HTTP.BaseURL != "" {
+			if u, err := url.Parse(config.HTTP.BaseURL + event.GetURL()); err == nil {
+				icalEvent.Url = values.NewUrl(*u)
+			}
+		}
+		return icalEvent
+	}
+
 	raceSetup := event.GetRaceSetup()
 
 	trackInfo := trackInfo(raceSetup.Track, raceSetup.TrackLayout)
@@ -446,8 +456,18 @@ func BuildCalObject(scheduled []ScheduledEvent, calendarObjects []CalendarObject
 				AllDay:            false,
 				Start:             start,
 				End:               end,
-				Title:             GenerateSummary(scheduledEvent.GetRaceSetup(), session.Name) + " " + scheduledEvent.GetSummary(),
-				Description:       carList(scheduledEvent.GetRaceSetup().Cars) + ": " + scheduledEvent.ReadOnlyEntryList().Entrants(),
+				Title: func() string {
+					if champEvent, ok := scheduledEvent.(*ChampionshipEvent); ok && champEvent.IsSecret() {
+						return "Secret Event " + scheduledEvent.GetSummary()
+					}
+					return GenerateSummary(scheduledEvent.GetRaceSetup(), session.Name) + " " + scheduledEvent.GetSummary()
+				}(),
+				Description: func() string {
+					if champEvent, ok := scheduledEvent.(*ChampionshipEvent); ok && champEvent.IsSecret() {
+						return ""
+					}
+					return carList(scheduledEvent.GetRaceSetup().Cars) + ": " + scheduledEvent.ReadOnlyEntryList().Entrants()
+				}(),
 				URL:               pageURL,
 				SignUpURL:         signUpURL,
 				ClassNames:        classNames,

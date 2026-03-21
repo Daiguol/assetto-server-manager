@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"sort"
 	"strconv"
@@ -1016,4 +1017,263 @@ func (ch *ChampionshipsHandler) duplicateEvent(w http.ResponseWriter, r *http.Re
 		AddFlash(w, r, "Championship Event was successfully duplicated!")
 		http.Redirect(w, r, "/championship/"+championshipID+"/event/"+newEvent.ID.String()+"/edit", http.StatusFound)
 	}
+}
+
+
+// apiChampionshipEvents returns all events of a championship as JSON.
+// GET /api/championship/{championshipID}/events
+func (ch *ChampionshipsHandler) apiChampionshipEvents(w http.ResponseWriter, r *http.Request) {
+	championship, err := ch.championshipManager.LoadChampionship(chi.URLParam(r, "championshipID"))
+	if err != nil {
+		logrus.WithError(err).Error("couldn't load championship for API")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	type eventDTO struct {
+		ID        string `json:"id"`
+		Index     int    `json:"index"`
+		Track     string `json:"track"`
+		Layout    string `json:"layout"`
+		Started   bool   `json:"started"`
+		Completed bool   `json:"completed"`
+		ClassID   string `json:"classId"`
+		ClassName string `json:"className"`
+	}
+
+	// build classID → name map
+	classNames := make(map[string]string)
+	for _, cl := range championship.Classes {
+		classNames[cl.ID.String()] = cl.Name
+	}
+
+	events := make([]eventDTO, 0, len(championship.Events))
+	for i, ev := range championship.Events {
+		classIDStr := ev.ClassID.String()
+		if ev.ClassID == uuid.Nil {
+			classIDStr = ""
+		}
+		events = append(events, eventDTO{
+			ID:        ev.ID.String(),
+			Index:     i,
+			Track:     ev.RaceSetup.Track,
+			Layout:    ev.RaceSetup.TrackLayout,
+			Started:   ev.InProgress() || ev.Completed(),
+			Completed: ev.Completed(),
+			ClassID:   classIDStr,
+			ClassName: classNames[classIDStr],
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(events); err != nil {
+		logrus.WithError(err).Error("couldn't encode events JSON")
+	}
+}
+
+// apiStartChampionshipEvent starts a championship event and responds with JSON.
+// POST /api/championship/{championshipID}/event/{eventID}/start
+func (ch *ChampionshipsHandler) apiStartChampionshipEvent(w http.ResponseWriter, r *http.Request) {
+	championshipID := chi.URLParam(r, "championshipID")
+	eventID := chi.URLParam(r, "eventID")
+
+	err := ch.championshipManager.StartEvent(championshipID, eventID, false)
+
+	w.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		logrus.WithError(err).Error("couldn't start championship event via API")
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+	_ = json.NewEncoder(w).Encode(map[string]bool{"ok": true})
+}
+
+// apiListChampionships returns active (non-completed) championships as JSON.
+// GET /api/championships
+func (ch *ChampionshipsHandler) apiListChampionships(w http.ResponseWriter, r *http.Request) {
+	championships, err := ch.championshipManager.ListChampionships()
+	if err != nil {
+		logrus.WithError(err).Error("couldn't list championships for API")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	type championshipDTO struct {
+		ID       string `json:"id"`
+		Name     string `json:"name"`
+		Progress float64 `json:"progress"`
+	}
+
+	var result []championshipDTO
+	for _, c := range championships {
+		if c.Progress() < 100 {
+			result = append(result, championshipDTO{
+				ID:       c.ID.String(),
+				Name:     c.Name,
+				Progress: c.Progress(),
+			})
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		logrus.WithError(err).Error("couldn't encode championships JSON")
+	}
+}
+
+// randomEventsConfig shows the race configuration form before generating random events.
+// GET /championship/{championshipID}/random-events
+func (ch *ChampionshipsHandler) randomEventsConfig(w http.ResponseWriter, r *http.Request) {
+	championshipID := chi.URLParam(r, "championshipID")
+
+	opts, err := ch.championshipManager.BuildChampionshipEventOpts(r)
+	if err != nil {
+		logrus.WithError(err).Error("couldn't build random events config form")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	opts.FormAction = "/championship/" + championshipID + "/random-events"
+
+	ch.viewRenderer.MustLoadTemplate(w, r, "custom-race/new.html", opts)
+}
+
+// generateRandomEvents parses a race config from the form and creates N pending events,
+// each picking a random pool-linked class and a random track from that class's pool.
+// POST /championship/{championshipID}/random-events
+func (ch *ChampionshipsHandler) generateRandomEvents(w http.ResponseWriter, r *http.Request) {
+	championshipID := chi.URLParam(r, "championshipID")
+
+	championship, err := ch.championshipManager.LoadChampionship(championshipID)
+	if err != nil {
+		logrus.WithError(err).Error("couldn't load championship for random events")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	raceConfig, err := ch.championshipManager.BuildCustomRaceFromForm(r)
+	if err != nil {
+		logrus.WithError(err).Error("couldn't parse race config for random events")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	numEvents := 1
+	if n, parseErr := strconv.Atoi(r.FormValue("NumRandomEvents")); parseErr == nil && n > 0 {
+		if n > 50 {
+			n = 50
+		}
+		numEvents = n
+	}
+
+	// Build slice of pool-linked classes that have tracks available.
+	type classWithPool struct {
+		class *ChampionshipClass
+		pool  *TrackCarPool
+	}
+	var eligible []classWithPool
+	for i := range championship.Classes {
+		class := championship.Classes[i]
+		if class.PoolID == uuid.Nil {
+			continue
+		}
+		pool, loadErr := ch.championshipManager.store.LoadTrackCarPool(class.PoolID.String())
+		if loadErr != nil || len(pool.Tracks) == 0 {
+			logrus.WithError(loadErr).Warnf("skipping class %s: pool has no tracks", class.Name)
+			continue
+		}
+		eligible = append(eligible, classWithPool{class: class, pool: pool})
+	}
+
+	if len(eligible) == 0 {
+		AddErrorFlash(w, r, "No pool-linked classes found. Add pools to the championship classes first.")
+		http.Redirect(w, r, "/championship/"+championshipID, http.StatusFound)
+		return
+	}
+
+	avoidRepeat := r.FormValue("AvoidRepeatTracks") == "1"
+	usedTracks := make(map[uuid.UUID]map[string]bool) // poolID → "track|layout"
+
+	// Generate events into per-class buckets for interleaving.
+	// Round-robin through eligible classes so classes alternate rather than cluster.
+	classBuckets := make(map[uuid.UUID][]*ChampionshipEvent)
+	var classOrder []uuid.UUID
+	for _, e := range eligible {
+		if _, seen := classBuckets[e.class.ID]; !seen {
+			classOrder = append(classOrder, e.class.ID)
+			classBuckets[e.class.ID] = nil
+		}
+	}
+	// Shuffle class order for variety each run.
+	rand.Shuffle(len(classOrder), func(i, j int) { classOrder[i], classOrder[j] = classOrder[j], classOrder[i] })
+
+	// Build a pool-lookup by class ID for the round-robin loop.
+	poolByClassID := make(map[uuid.UUID]*TrackCarPool)
+	for _, e := range eligible {
+		poolByClassID[e.class.ID] = e.pool
+	}
+
+	for i := 0; i < numEvents; i++ {
+		classID := classOrder[i%len(classOrder)]
+		pool := poolByClassID[classID]
+
+		tracks := pool.Tracks
+		var pt PoolTrack
+		if avoidRepeat {
+			poolID := classID // use classID as bucket key (one pool per class)
+			used := usedTracks[poolID]
+			if used == nil {
+				used = make(map[string]bool)
+				usedTracks[poolID] = used
+			}
+			var unused []PoolTrack
+			for _, t := range tracks {
+				if !used[t.Track+"|"+t.Layout] {
+					unused = append(unused, t)
+				}
+			}
+			if len(unused) > 0 {
+				tracks = unused
+			}
+			pt = tracks[rand.Intn(len(tracks))]
+			usedTracks[poolID][pt.Track+"|"+pt.Layout] = true
+		} else {
+			pt = tracks[rand.Intn(len(tracks))]
+		}
+
+		event := NewChampionshipEvent()
+		event.ClassID = classID
+		event.RaceSetup = *raceConfig
+		event.RaceSetup.Track = pt.Track
+		event.RaceSetup.TrackLayout = pt.Layout
+
+		classBuckets[classID] = append(classBuckets[classID], event)
+	}
+
+	// Interleave events from buckets: GTP → DTM → GTP → DTM → ...
+	created := 0
+	for {
+		added := false
+		for _, classID := range classOrder {
+			if len(classBuckets[classID]) > 0 {
+				championship.Events = append(championship.Events, classBuckets[classID][0])
+				classBuckets[classID] = classBuckets[classID][1:]
+				created++
+				added = true
+			}
+		}
+		if !added {
+			break
+		}
+	}
+
+	if err := ch.championshipManager.UpsertChampionship(championship); err != nil {
+		logrus.WithError(err).Error("couldn't save championship after generating random events")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	AddFlash(w, r, fmt.Sprintf("Generated %d random event(s) from pools!", created))
+	http.Redirect(w, r, "/championship/"+championshipID, http.StatusFound)
 }

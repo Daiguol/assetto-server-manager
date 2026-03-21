@@ -1,6 +1,7 @@
 package servermanager
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -411,4 +412,52 @@ func (crh *CustomRaceHandler) loop(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, r.Referer(), http.StatusFound)
+}
+
+// apiLoadTrack changes the track/layout of a custom race and starts it.
+// POST /api/custom/{uuid}/load-track
+// Body: {"track": "...", "layout": "..."}
+// Requires write access (same middleware group as /custom/load/{uuid}).
+func (crh *CustomRaceHandler) apiLoadTrack(w http.ResponseWriter, r *http.Request) {
+	raceUUID := chi.URLParam(r, "uuid")
+
+	var body struct {
+		Track  string `json:"track"`
+		Layout string `json:"layout"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, `{"error":"invalid JSON"}`, http.StatusBadRequest)
+		return
+	}
+
+	race, err := crh.store.FindCustomRaceByID(raceUUID)
+	if err != nil {
+		logrus.WithError(err).Errorf("apiLoadTrack: couldn't find custom race %s", raceUUID)
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, `{"error":"not found"}`, http.StatusNotFound)
+		return
+	}
+
+	race.RaceConfig.Track = body.Track
+	race.RaceConfig.TrackLayout = body.Layout
+
+	if err := crh.store.UpsertCustomRace(race); err != nil {
+		logrus.WithError(err).Errorf("apiLoadTrack: couldn't save custom race %s", raceUUID)
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, `{"error":"save failed"}`, http.StatusInternalServerError)
+		return
+	}
+
+	if _, err := crh.raceManager.StartCustomRace(raceUUID, false); err != nil {
+		logrus.WithError(err).Errorf("apiLoadTrack: couldn't start custom race %s", raceUUID)
+		w.Header().Set("Content-Type", "application/json")
+		http.Error(w, `{"error":"start failed"}`, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write([]byte(`{"ok":true}`))
 }

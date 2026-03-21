@@ -224,6 +224,17 @@
                 {{ end }}
 
                 <div class="form-group row">
+                    <label for="ChampionshipSecretCalendar" class="col-sm-3 col-form-label">
+                        Secret Calendar
+                        <span class="text-muted small d-block">Hides circuit details from non-admins for upcoming rounds</span>
+                    </label>
+                    <div class="col-sm-9">
+                        <input type="checkbox" id="ChampionshipSecretCalendar" name="ChampionshipSecretCalendar"
+                               {{ if $f.SecretCalendar }} checked="checked" {{ end }}>
+                    </div>
+                </div>
+
+                <div class="form-group row">
                     <label for="ChampionshipOpenEntrants" class="col-sm-3 col-form-label">Open Championship</label>
 
                     <div class="col-sm-9">
@@ -497,16 +508,171 @@
             </div>
         </div>
 
-        <div id="class-template" style="display: none;">
-            {{ template "championship-class" dict "IsEditing" $.IsEditing "CarOpts" $.CarOpts "Championship" $.Championship "Class" $.DefaultClass "DefaultPoints" $.DefaultPoints "MaxClientsOverride" $.MaxClientsOverride }}
-        </div>
+        {{/* ===== POOL CLASSES ===== */}}
+        {{ if $.Pools }}
+        <div class="card mt-3 border-success">
+            <div class="card-header">
+                <strong>Pool Classes</strong>
+                <small class="text-muted ml-2">Each selected pool becomes its own class. All pool classes share the same points configuration.</small>
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Pools</label>
+                    <div class="col-sm-9">
+                        <div class="pool-selector">
+                            {{ range $.Pools }}
+                                <div class="pool-toggle-card {{ if index $.LinkedPoolIDs (.ID.String) }}pool-toggle-active{{ end }}"
+                                     data-pool-id="{{ .ID.String }}">
+                                    {{ if index $.LinkedPoolIDs (.ID.String) }}
+                                        <input type="hidden" name="ChampionshipPoolIDs" value="{{ .ID.String }}" class="pool-hidden-input">
+                                    {{ end }}
+                                    <div class="pool-toggle-check">✓</div>
+                                    <div class="pool-toggle-name">{{ .Name }}</div>
+                                    <div class="pool-toggle-info">{{ len .Cars }} cars · {{ len .Tracks }} tracks</div>
+                                </div>
+                            {{ end }}
+                        </div>
+                        <style>
+                            .pool-selector { display: flex; flex-wrap: wrap; gap: 8px; }
+                            .pool-toggle-card {
+                                position: relative; cursor: pointer; border: 2px solid #dee2e6;
+                                border-radius: 8px; padding: 10px 14px; min-width: 130px;
+                                user-select: none; transition: border-color .15s, background .15s;
+                                background: #fff; color: #212529;
+                            }
+                            .pool-toggle-card:hover { border-color: #adb5bd; }
+                            .pool-toggle-card.pool-toggle-active { border-color: #28a745; background: #d4edda; color: #155724; }
+                            .pool-toggle-check {
+                                position: absolute; top: 6px; right: 8px; font-size: 12px;
+                                color: #28a745; opacity: 0; transition: opacity .15s;
+                            }
+                            .pool-toggle-card.pool-toggle-active .pool-toggle-check { opacity: 1; color: #155724; }
+                            .pool-toggle-name { font-weight: 600; font-size: .9rem; }
+                            .pool-toggle-info { font-size: .75rem; color: #6c757d; margin-top: 2px; }
+                            .pool-toggle-card.pool-toggle-active .pool-toggle-info { color: #1e7e34; }
+                        </style>
+                        <script>
+                        document.querySelectorAll('.pool-toggle-card').forEach(function(card) {
+                            card.addEventListener('click', function() {
+                                var poolId = card.getAttribute('data-pool-id');
+                                var active = card.classList.toggle('pool-toggle-active');
+                                var existing = card.querySelector('.pool-hidden-input');
+                                if (active) {
+                                    if (!existing) {
+                                        var inp = document.createElement('input');
+                                        inp.type = 'hidden';
+                                        inp.name = 'ChampionshipPoolIDs';
+                                        inp.value = poolId;
+                                        inp.className = 'pool-hidden-input';
+                                        card.appendChild(inp);
+                                    }
+                                } else {
+                                    if (existing) existing.remove();
+                                }
+                            });
+                        });
+                        </script>
+                    </div>
+                </div>
 
-        {{ range $classIndex, $class := $f.Classes }}
-            {{ template "championship-class" dict "IsEditing" $.IsEditing "CarOpts" $.CarOpts "Championship" $.Championship "Class" $class "DefaultPoints" $.DefaultPoints "MaxClientsOverride" $.MaxClientsOverride }}
-        {{ else }}
-            {{ template "championship-class" dict "IsEditing" $.IsEditing "CarOpts" $.CarOpts "Championship" $.Championship "Class" $.DefaultClass "DefaultPoints" $.DefaultPoints "MaxClientsOverride" $.MaxClientsOverride }}
+                <hr>
+                <h5>Points <small class="text-muted font-weight-normal">(shared for all pool classes)</small></h5>
+
+                {{/* Find existing pool points from first pool-linked class, or use defaults */}}
+                {{ $poolPts := $.DefaultPoints }}
+                {{ range $f.Classes }}
+                    {{ if index $.LinkedPoolIDs (.PoolID.String) }}{{ $poolPts = .Points }}{{ end }}
+                {{ end }}
+
+                <div class="mt-3">
+                    {{ if and $.IsEditing $poolPts.Places }}
+                        {{ $posCount := int64 1 }}
+                        {{ range $poolPts.Places }}
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">{{ $posCount }}{{ ordinal $posCount }} Place</label>
+                                <div class="col-sm-9">
+                                    <input type="number" class="form-control" name="PoolClassPoints.Place" value="{{ . }}">
+                                </div>
+                            </div>
+                            {{ $posCount = add $posCount 1 }}
+                        {{ end }}
+                    {{ else }}
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">1st Place</label>
+                            <div class="col-sm-9">
+                                <input type="number" class="form-control" name="PoolClassPoints.Place"
+                                       value="{{ index $.DefaultPoints.Places 0 }}">
+                            </div>
+                        </div>
+                    {{ end }}
+                    <input type="hidden" name="NumPoolClassPoints"
+                           value="{{ if and $.IsEditing $poolPts.Places }}{{ len $poolPts.Places }}{{ else }}1{{ end }}">
+                </div>
+
+                <div class="form-group row mt-2">
+                    <label class="col-sm-3 col-form-label">Best Lap</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" name="PoolClassPoints.BestLap"
+                               value="{{ $poolPts.BestLap }}">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Pole Position</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" name="PoolClassPoints.PolePosition"
+                               value="{{ $poolPts.PolePosition }}">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Second Race Multiplier</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" name="PoolClassPoints.SecondRaceMultiplier" step="0.01"
+                               value="{{ $poolPts.SecondRaceMultiplier }}">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Collision with Driver</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" name="PoolClassPoints.CollisionWithDriver"
+                               value="{{ $poolPts.CollisionWithDriver }}">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Collision with Environment</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" name="PoolClassPoints.CollisionWithEnv"
+                               value="{{ $poolPts.CollisionWithEnv }}">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Cut Track</label>
+                    <div class="col-sm-9">
+                        <input type="number" class="form-control" name="PoolClassPoints.CutTrack"
+                               value="{{ $poolPts.CutTrack }}">
+                    </div>
+                </div>
+            </div>
+        </div>
         {{ end }}
 
+        {{/* ===== MANUAL CLASSES ===== */}}
+        <div id="class-template" style="display: none;">
+            {{ template "championship-class" dict "IsEditing" $.IsEditing "CarOpts" $.CarOpts "Championship" $.Championship "Class" $.DefaultClass "DefaultPoints" $.DefaultPoints "MaxClientsOverride" $.MaxClientsOverride "Pools" $.Pools }}
+        </div>
+
+        {{ $hasManualClass := false }}
+        {{ range $f.Classes }}{{ if eq (.PoolID.String) (nilUUID) }}{{ $hasManualClass = true }}{{ end }}{{ end }}
+
+        {{ if $hasManualClass }}
+            {{ range $f.Classes }}
+                {{ if eq (.PoolID.String) (nilUUID) }}
+                    {{ template "championship-class" dict "IsEditing" $.IsEditing "CarOpts" $.CarOpts "Championship" $.Championship "Class" . "DefaultPoints" $.DefaultPoints "MaxClientsOverride" $.MaxClientsOverride "Pools" $.Pools }}
+                {{ end }}
+            {{ end }}
+        {{ else if and (not $.IsEditing) (not $.Pools) }}
+            {{/* Only show the empty default class when there are no pools to choose from */}}
+            {{ template "championship-class" dict "IsEditing" $.IsEditing "CarOpts" $.CarOpts "Championship" $.Championship "Class" $.DefaultClass "DefaultPoints" $.DefaultPoints "MaxClientsOverride" $.MaxClientsOverride "Pools" $.Pools }}
+        {{ end }}
 
         <div class="mt-3">
             <button id="addClass" class="btn btn-primary float-right">Add another class</button>

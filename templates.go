@@ -21,6 +21,7 @@ import (
 	"github.com/Masterminds/sprig"
 	"github.com/getsentry/raven-go"
 	"github.com/go-chi/chi"
+	"github.com/google/uuid"
 	"github.com/mattn/go-zglob"
 	"github.com/sirupsen/logrus"
 )
@@ -248,6 +249,7 @@ func (tr *Renderer) init() error {
 	funcs["trackMapURL"] = TrackMapImageURL
 	funcs["sunAngleToTimeOfDay"] = sunAngleToTimeOfDay
 	funcs["anonymiseDriverGUID"] = AnonymiseDriverGUID
+	funcs["nilUUID"] = func() string { return uuid.Nil.String() }
 
 	tr.templates, err = tr.loader.Templates(funcs)
 

@@ -39,13 +39,88 @@
 
     {{ if .IsChampionship }}
         <p>Configure an Event for the <strong>{{ .Championship.Name }}</strong> Championship.</p>
+
+
+        {{ $classesWithPools := false }}
+        {{ range .Championship.Classes }}{{ if ne (.PoolID.String) (nilUUID) }}{{ $classesWithPools = true }}{{ end }}{{ end }}
+
+        {{ if $classesWithPools }}
+        {{/* Pool tracks data for JS track filtering */}}
+        <script>
+        window._poolTracks = {};
+        </script>
+
+        <div class="card mt-3 mb-3 border-info">
+            <div class="card-header"><strong>Class &amp; Pool</strong></div>
+            <div class="card-body">
+                <div class="form-group row">
+                    <label for="ChampionshipEventClassID" class="col-sm-3 col-form-label">
+                        Class
+                        <span class="text-muted small d-block">Track list will be filtered to tracks in this class's pool.</span>
+                    </label>
+                    <div class="col-sm-9">
+                        <select class="form-control" id="ChampionshipEventClassID" name="ChampionshipEventClassID">
+                            <option value="">— All classes —</option>
+                            {{ range .Championship.Classes }}
+                                <option value="{{ .ID.String }}"
+                                    data-pool-id="{{ .PoolID.String }}"
+                                    {{ if and $.IsEditing (eq (.ID.String) $.EditingID) }}selected="selected"{{ end }}>
+                                    {{ .Name }}{{ if ne (.PoolID.String) (nilUUID) }} 🔗{{ end }}
+                                </option>
+                            {{ end }}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+        (function() {
+            var sel = document.getElementById('ChampionshipEventClassID');
+            if (!sel) return;
+
+            function filterTracks() {
+                var opt = sel.options[sel.selectedIndex];
+                var poolId = opt ? opt.getAttribute('data-pool-id') : '';
+                var nilUUID = '00000000-0000-0000-0000-000000000000';
+                if (!poolId || poolId === nilUUID) {
+                    // restore all track options
+                    document.querySelectorAll('#Track option, #Track optgroup').forEach(function(el) {
+                        el.style.display = '';
+                    });
+                    return;
+                }
+                // fetch pool tracks and filter
+                fetch('/api/pools')
+                    .then(function(r) { return r.json(); })
+                    .then(function(pools) {
+                        var pool = pools.find(function(p) { return p.id === poolId; });
+                        if (!pool) return;
+                        var validTracks = {};
+                        pool.tracks.forEach(function(t) { validTracks[t.track] = true; });
+                        document.querySelectorAll('#Track option').forEach(function(el) {
+                            el.style.display = validTracks[el.value] ? '' : 'none';
+                        });
+                        // pick first visible
+                        var firstVisible = Array.from(document.querySelectorAll('#Track option')).find(function(o) { return o.style.display !== 'none'; });
+                        if (firstVisible) document.getElementById('Track').value = firstVisible.value;
+                    });
+            }
+
+            sel.addEventListener('change', filterTracks);
+            filterTracks();
+        })();
+        </script>
+        {{ end }}
+
     {{ else if .IsRaceWeekend }}
         <p>Configure a Session for the <strong>{{ .RaceWeekend.Name }}</strong> Race Weekend.</p>
     {{ end }}
 
     <form class="race-setup"
           method="post"
-          {{ if .IsChampionship }}
+          {{ if .FormAction }}
+              action="{{ .FormAction }}"
+          {{ else if .IsChampionship }}
               action="/championship/{{ .Championship.ID.String }}/event/submit"
           {{ else if .IsRaceWeekend }}
               id="race-weekend-session"
@@ -1866,9 +1941,33 @@
                         </p>
                     {{ end }}
 
+                    {{ if .FormAction }}
+                        <div class="form-group row mt-3">
+                            <label for="NumRandomEvents" class="col-sm-3 col-form-label">
+                                Number of events
+                                <small class="text-muted d-block">One per round, pools can repeat</small>
+                            </label>
+                            <div class="col-sm-3">
+                                <input type="number" class="form-control" id="NumRandomEvents" name="NumRandomEvents"
+                                       min="1" max="50" value="1">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="AvoidRepeatTracks" class="col-sm-3 col-form-label">
+                                No repetir circuitos
+                                <small class="text-muted d-block">Evita usar el mismo circuito dos veces en la misma pool</small>
+                            </label>
+                            <div class="col-sm-3 d-flex align-items-center">
+                                <input type="checkbox" id="AvoidRepeatTracks" name="AvoidRepeatTracks" value="1">
+                            </div>
+                        </div>
+                    {{ end }}
+
                     <div class="float-right mt-5">
 
-                        {{ if not .IsEditing }}
+                        {{ if .FormAction }}
+                            <button class="btn btn-warning" name="action" value="saveChampionship" type="submit">Generate Random Events</button>
+                        {{ else if not .IsEditing }}
                             <button class="btn btn-primary" data-toggle="tooltip" name="action" value="addAnotherRace" type="submit" title="Save this setup and then configure another">Add another Event</button>
                             <button class="btn btn-success" data-toggle="tooltip" name="action" value="saveChampionship" type="submit" title="Save this event setup and finish creating the championship">Finish Creating Championship</button>
                         {{ else }}

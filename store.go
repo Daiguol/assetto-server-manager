@@ -53,6 +53,12 @@ type Store interface {
 	LoadRaceWeekend(id string) (*RaceWeekend, error)
 	DeleteRaceWeekend(id string) error
 
+	// Track/Car Pools
+	UpsertTrackCarPool(pool *TrackCarPool) error
+	LoadTrackCarPool(id string) (*TrackCarPool, error)
+	ListTrackCarPools() ([]*TrackCarPool, error)
+	DeleteTrackCarPool(id string) error
+
 	// Stracker Options
 	UpsertStrackerOptions(sto *StrackerConfiguration) error
 	LoadStrackerOptions() (*StrackerConfiguration, error)

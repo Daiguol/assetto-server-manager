@@ -132,6 +132,9 @@ type Championship struct {
 	SpectatorCarEnabled bool
 
 	DefaultTab ChampionshipTab
+
+	// SecretCalendar hides circuit details of future (not started, not completed) rounds from non-admins.
+	SecretCalendar bool
 }
 
 func (c *Championship) HasSpectatorCar() bool {
@@ -350,6 +353,16 @@ func (c *Championship) IsMultiClass() bool {
 	return len(c.Classes) > 1
 }
 
+// HasPoolClasses returns true if any class in the championship is linked to a pool.
+func (c *Championship) HasPoolClasses() bool {
+	for _, class := range c.Classes {
+		if class.PoolID != uuid.Nil {
+			return true
+		}
+	}
+	return false
+}
+
 func (c *Championship) SignUpAvailable() bool {
 	numTotalEntrants := 0
 	numFilledSlots := 0
@@ -520,8 +533,9 @@ func NewChampionshipClass(name string) *ChampionshipClass {
 
 // ChampionshipClass contains a Name, Entrants (including Cars, Skins) and Points for those Entrants
 type ChampionshipClass struct {
-	ID   uuid.UUID
-	Name string
+	ID     uuid.UUID
+	Name   string
+	PoolID uuid.UUID // optional: links this class to a TrackCarPool
 
 	Entrants      EntryList
 	Points        ChampionshipPoints
@@ -1462,7 +1476,8 @@ func DuplicateChampionshipEvent(event *ChampionshipEvent) *ChampionshipEvent {
 type ChampionshipEvent struct {
 	ScheduledEventBase
 
-	ID uuid.UUID
+	ID      uuid.UUID
+	ClassID uuid.UUID // if set, this event runs only for the class with this ID
 
 	RaceSetup CurrentRaceConfig
 	EntryList EntryList
@@ -1482,6 +1497,12 @@ type ChampionshipEvent struct {
 
 func (cr *ChampionshipEvent) IsRaceWeekend() bool {
 	return cr.RaceWeekendID != uuid.Nil
+}
+
+// IsSecret reports whether this event's details should be hidden because it belongs to a
+// SecretCalendar championship and the event has not yet started or completed.
+func (cr *ChampionshipEvent) IsSecret() bool {
+	return cr.championship != nil && cr.championship.SecretCalendar && !cr.InProgress() && !cr.Completed()
 }
 
 func (cr *ChampionshipEvent) GetSummary() string {

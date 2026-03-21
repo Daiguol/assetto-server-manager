@@ -178,6 +178,8 @@ type ChampionshipTemplateVars struct {
 	ACSREnabled               bool
 	ACSRRanges                *ACSRRanges
 	AvailableChampionshipTabs []ChampionshipTab
+	Pools                     []*TrackCarPool
+	LinkedPoolIDs             map[string]bool // pool IDs that already have a class in this championship
 }
 
 type ACSRRanges struct {
@@ -251,6 +253,21 @@ func (cm *ChampionshipManager) BuildChampionshipOpts(r *http.Request) (champions
 		}
 	}
 
+	pools, err := cm.store.ListTrackCarPools()
+	if err != nil {
+		logrus.WithError(err).Warn("couldn't load pools for championship form")
+	} else {
+		opts.Pools = pools
+	}
+
+	linkedPoolIDs := make(map[string]bool)
+	for _, class := range championship.Classes {
+		if class.PoolID != uuid.Nil {
+			linkedPoolIDs[class.PoolID.String()] = true
+		}
+	}
+	opts.LinkedPoolIDs = linkedPoolIDs
+
 	return championship, opts, nil
 }
 
@@ -305,6 +322,7 @@ func (cm *ChampionshipManager) HandleCreateChampionship(r *http.Request) (champi
 	championship.Info = template.HTML(r.FormValue("ChampionshipInfo"))
 	championship.DefaultTab = ChampionshipTab(r.FormValue("ChampionshipDefaultTab"))
 	championship.OverridePassword = r.FormValue("OverridePassword") == "on" || r.FormValue("OverridePassword") == "1"
+	championship.SecretCalendar = r.FormValue("ChampionshipSecretCalendar") == "on" || r.FormValue("ChampionshipSecretCalendar") == "1"
 
 	if Premium() {
 		championship.OGImage = r.FormValue("ChampionshipOGImage")
@@ -357,6 +375,12 @@ func (cm *ChampionshipManager) HandleCreateChampionship(r *http.Request) (champi
 
 		if classID := r.Form["ClassID"][i]; classID != "" && classID != uuid.Nil.String() {
 			class.ID = uuid.MustParse(classID)
+		}
+
+		if len(r.Form["ClassPoolID"]) > i {
+			if poolIDStr := r.Form["ClassPoolID"][i]; poolIDStr != "" && poolIDStr != uuid.Nil.String() {
+				class.PoolID = uuid.MustParse(poolIDStr)
+			}
 		}
 
 		numEntrantsForClass := formValueAsInt(r.Form["EntryList.NumEntrants"][i])
@@ -424,6 +448,57 @@ func (cm *ChampionshipManager) HandleCreateChampionship(r *http.Request) (champi
 		previousNumEntrants += numEntrantsForClass
 		previousNumPoints += numPointsForClass
 		previousNumCars += numCarsForClass
+	}
+
+	// Process pool-linked classes (shared points, no pre-registered entrants required)
+	// Build a lookup of previous pool-linked classes by PoolID so we can preserve their IDs.
+	previousClassesByPoolID := make(map[uuid.UUID]ChampionshipClass)
+	for _, cls := range previousClasses {
+		if cls.PoolID != uuid.Nil {
+			previousClassesByPoolID[cls.PoolID] = cls
+		}
+	}
+
+	selectedPoolIDs := r.Form["ChampionshipPoolIDs"]
+	if len(selectedPoolIDs) > 0 {
+		// Parse the single shared points config for all pool classes.
+		poolPoints := ChampionshipPoints{Places: make([]int, 0)}
+		numPoolPoints := formValueAsInt(r.FormValue("NumPoolClassPoints"))
+		for i := 0; i < numPoolPoints && i < len(r.Form["PoolClassPoints.Place"]); i++ {
+			poolPoints.Places = append(poolPoints.Places, formValueAsInt(r.Form["PoolClassPoints.Place"][i]))
+		}
+		poolPoints.BestLap = formValueAsInt(r.FormValue("PoolClassPoints.BestLap"))
+		poolPoints.PolePosition = formValueAsInt(r.FormValue("PoolClassPoints.PolePosition"))
+		poolPoints.SecondRaceMultiplier = formValueAsFloat(r.FormValue("PoolClassPoints.SecondRaceMultiplier"))
+		poolPoints.CollisionWithDriver = formValueAsInt(r.FormValue("PoolClassPoints.CollisionWithDriver"))
+		poolPoints.CollisionWithEnv = formValueAsInt(r.FormValue("PoolClassPoints.CollisionWithEnv"))
+		poolPoints.CutTrack = formValueAsInt(r.FormValue("PoolClassPoints.CutTrack"))
+
+		for _, poolIDStr := range selectedPoolIDs {
+			if poolIDStr == "" || poolIDStr == uuid.Nil.String() {
+				continue
+			}
+			poolID, parseErr := uuid.Parse(poolIDStr)
+			if parseErr != nil {
+				continue
+			}
+			pool, loadErr := cm.store.LoadTrackCarPool(poolIDStr)
+			if loadErr != nil {
+				logrus.WithError(loadErr).Warnf("couldn't load pool %s for championship", poolIDStr)
+				continue
+			}
+			class := NewChampionshipClass(pool.Name)
+			class.PoolID = poolID
+			class.Points = poolPoints
+			// Preserve existing class ID and entrants if this pool was already linked.
+			if prev, ok := previousClassesByPoolID[poolID]; ok {
+				class.ID = prev.ID
+				class.DriverPenalties = prev.DriverPenalties
+				class.TeamPenalties = prev.TeamPenalties
+				class.Entrants = prev.Entrants
+			}
+			championship.AddClass(class)
+		}
 	}
 
 	// persist any entrants so that they can be autofilled
@@ -617,6 +692,10 @@ func (cm *ChampionshipManager) SaveChampionshipEvent(r *http.Request) (champions
 		championship.Events = append(championship.Events, event)
 	}
 
+	if classIDStr := r.FormValue("ChampionshipEventClassID"); classIDStr != "" && classIDStr != uuid.Nil.String() {
+		event.ClassID = uuid.MustParse(classIDStr)
+	}
+
 	return championship, event, edited, cm.UpsertChampionship(championship)
 }
 
@@ -665,6 +744,83 @@ func (cm *ChampionshipManager) StartPracticeEvent(championshipID string, eventID
 
 func (cm *ChampionshipManager) FinalEventConfigurationFiles(championship *Championship, event *ChampionshipEvent, isPreChampionshipPracticeEvent bool) (CurrentRaceConfig, EntryList) {
 	raceSetup := event.RaceSetup
+
+	// If the event is scoped to a specific class, restrict cars and entry list to that class only.
+	if event.ClassID != uuid.Nil {
+		for _, class := range championship.Classes {
+			if class.ID != event.ClassID {
+				continue
+			}
+
+			// Prefer pool cars when the class is pool-linked (works even with no pre-registered entrants)
+			if class.PoolID != uuid.Nil {
+				if pool, err := cm.store.LoadTrackCarPool(class.PoolID.String()); err == nil && len(pool.Cars) > 0 {
+					raceSetup.Cars = strings.Join(pool.Cars, ";")
+				} else {
+					raceSetup.Cars = strings.Join(class.ValidCarIDs(), ";")
+				}
+			} else {
+				raceSetup.Cars = strings.Join(class.ValidCarIDs(), ";")
+			}
+
+			raceSetup.LoopMode = 1
+
+			var entryList EntryList
+
+			if championship.OpenEntrants || len(class.Entrants) == 0 {
+				// Open / pickup mode: anyone can join with any car from the pool.
+				// AC still needs pit-box entries in entry_list.ini to create slots.
+				raceSetup.PickupModeEnabled = 1
+				raceSetup.LockedEntryList = 0
+
+				// Use track pit box count as the slot limit (same logic as quick race).
+				numSlots := raceSetup.MaxClients
+				if trackData, err := GetTrackInfo(raceSetup.Track, raceSetup.TrackLayout); err == nil {
+					if boxes, err := trackData.Pitboxes.Int64(); err == nil && boxes > 0 {
+						numSlots = int(boxes)
+					}
+				}
+				if numSlots <= 0 {
+					numSlots = 18
+				}
+				if MaxClientsOverride > 0 && numSlots > MaxClientsOverride {
+					numSlots = MaxClientsOverride
+				}
+				raceSetup.MaxClients = numSlots
+
+				availableCars := strings.Split(raceSetup.Cars, ";")
+				entryList = make(EntryList)
+				for i := 0; i < numSlots; i++ {
+					e := NewEntrant()
+					e.Model = availableCars[i%len(availableCars)]
+					entryList.AddToBackOfGrid(e)
+				}
+			} else {
+				// Closed entry list: only pre-registered class entrants.
+				entryList = make(EntryList)
+				for _, entrant := range class.Entrants.AsSlice() {
+					entryList.AddToBackOfGrid(entrant)
+				}
+
+				if championship.HasSpectatorCar() {
+					entryList.AddInPitBox(&championship.SpectatorCar, maxEntryListSize+1)
+				}
+
+				raceSetup.PickupModeEnabled = 1
+				raceSetup.LockedEntryList = 1
+
+				if !raceSetup.HasSession(SessionTypeBooking) {
+					raceSetup.MaxClients = len(entryList)
+				} else {
+					logrus.Infof("Championship event (class %s) has a booking session. Disabling PickupMode, clearing EntryList", class.Name)
+					raceSetup.PickupModeEnabled = 0
+					entryList = nil
+				}
+			}
+
+			return raceSetup, entryList
+		}
+	}
 
 	raceSetup.Cars = strings.Join(championship.ValidCarIDs(), ";")
 

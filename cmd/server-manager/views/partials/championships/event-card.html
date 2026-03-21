@@ -8,14 +8,29 @@
 
     {{ $eventSetup := $event.RaceSetup }}
 
+    {{ $trackInfo := trackInfo $eventSetup.Track $eventSetup.TrackLayout }}
+
+    {{/* $isSecret: hide track details from everyone for future rounds */}}
+    {{ $isSecret := and $championship.SecretCalendar (not $event.InProgress) (not $event.Completed) }}
+
     <div class="card mt-3 border-secondary championship-event {{ if $event.Completed }}event-complete{{ end }}" id="{{ $event.ID.String }}">
         <div class="card-header">
-            {{ $trackInfo := trackInfo $eventSetup.Track $eventSetup.TrackLayout }}
-
+            {{ if $isSecret }}
+                <strong>Round {{ add $eventIndex 1 }} — Secret</strong>
+            {{ else }}
             {{ with $trackInfo }}
                 <strong>{{ .Name }}{{ with .Country }}, {{ . }}{{ end }}</strong>
             {{ else }}
                 <strong>{{ prettify $eventSetup.Track false }} {{ with $eventSetup.TrackLayout }}({{ prettify . true }}){{ end }}</strong>
+            {{ end }}
+            {{ end }}
+
+            {{ if ne ($event.ClassID.String) (nilUUID) }}
+                {{ range $championship.Classes }}
+                    {{ if eq (.ID.String) ($event.ClassID.String) }}
+                        <span class="badge badge-secondary ml-1">{{ .Name }}</span>
+                    {{ end }}
+                {{ end }}
             {{ end }}
 
             <div class="float-right">
@@ -55,6 +70,7 @@
                         {{ end }}
                     {{ end }}
 
+                    {{ if not $isSecret }}
                     <div class="row">
                         <div class="{{ if isBefore $scheduled }}col-sm-8{{ else }}col-sm-4{{ end }}">
                             <ul class="list-unstyled">
@@ -267,16 +283,21 @@
                         </div>
 
                     </div>
+                    {{ else }}
+                        <p class="text-muted mt-3">Details will be revealed when this round starts.</p>
+                    {{ end }}
 
 
                 </div>
 
+                {{ if not $isSecret }}
                 <div class="col-md-4">
                     <img class="img img-fluid ml-2 float-right image-track mb-2"
                          src="/content/tracks/{{ $eventSetup.Track }}/ui{{ with $eventSetup.TrackLayout }}/{{.}}{{ end }}/preview.png"
                          alt="{{ $eventSetup.Track }} {{ $eventSetup.TrackLayout }}"
                     >
                 </div>
+                {{ end }}
             </div>
 
 
@@ -416,7 +437,7 @@
                             {{ end }}
                         {{ end }}
 
-                        {{ if $.ShowEventDetailsPopup }}
+                        {{ if and $.ShowEventDetailsPopup (not $isSecret) }}
                             <a class="btn btn-info championship-event-details"
                                href="#"
                                data-event-id="{{ $event.ID }}"

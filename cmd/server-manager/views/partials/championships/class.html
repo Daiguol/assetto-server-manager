@@ -20,6 +20,28 @@
             </div>
         </div>
 
+        {{ if $.Pools }}
+        <div class="form-group row">
+            <label for="ClassPoolID" class="col-sm-3 col-form-label">
+                Pool
+                <span class="text-muted small d-block">Links this class to a car/track pool. Events for this class will only use tracks from the pool.</span>
+            </label>
+            <div class="col-sm-9">
+                <select class="form-control" name="ClassPoolID" id="ClassPoolID">
+                    <option value="">— No pool —</option>
+                    {{ range $.Pools }}
+                        <option value="{{ .ID.String }}"
+                            {{ if eq (.ID.String) ($class.PoolID.String) }}selected="selected"{{ end }}>
+                            {{ .Name }}
+                        </option>
+                    {{ end }}
+                </select>
+            </div>
+        </div>
+        {{ else }}
+        <input type="hidden" name="ClassPoolID" value="">
+        {{ end }}
+
         <div class="form-group row">
             <label for="Cars" class="col-sm-3 col-form-label">
                 Cars

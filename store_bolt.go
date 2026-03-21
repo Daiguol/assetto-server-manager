@@ -25,6 +25,7 @@ var (
 	frameLinksBucketName    = []byte("frameLinks")
 	raceWeekendsBucketName  = []byte("raceWeekends")
 	liveTimingsBucketName   = []byte("liveTimings")
+	trackCarPoolsBucketName = []byte("trackCarPools")
 
 	serverOptionsKey      = []byte("serverOptions")
 	strackerOptionsKey    = []byte("strackerOptions")
@@ -1044,4 +1045,79 @@ func (rs *BoltStore) ClearLastRaceEvent() error {
 
 		return bkt.Delete(lastRaceEventKey)
 	})
+}
+
+func (rs *BoltStore) trackCarPoolBucket(tx *bbolt.Tx) (*bbolt.Bucket, error) {
+	if !tx.Writable() {
+		bkt := tx.Bucket(trackCarPoolsBucketName)
+		if bkt == nil {
+			return nil, bbolt.ErrBucketNotFound
+		}
+		return bkt, nil
+	}
+	return tx.CreateBucketIfNotExists(trackCarPoolsBucketName)
+}
+
+func (rs *BoltStore) UpsertTrackCarPool(pool *TrackCarPool) error {
+	return rs.db.Update(func(tx *bbolt.Tx) error {
+		bkt, err := rs.trackCarPoolBucket(tx)
+		if err != nil {
+			return err
+		}
+		pool.Updated = time.Now()
+		encoded, err := rs.encode(pool)
+		if err != nil {
+			return err
+		}
+		return bkt.Put([]byte(pool.ID.String()), encoded)
+	})
+}
+
+func (rs *BoltStore) LoadTrackCarPool(id string) (*TrackCarPool, error) {
+	var pool *TrackCarPool
+	err := rs.db.View(func(tx *bbolt.Tx) error {
+		bkt, err := rs.trackCarPoolBucket(tx)
+		if err != nil {
+			return err
+		}
+		data := bkt.Get([]byte(id))
+		if data == nil {
+			return errors.New("pool not found")
+		}
+		return rs.decode(data, &pool)
+	})
+	return pool, err
+}
+
+func (rs *BoltStore) ListTrackCarPools() ([]*TrackCarPool, error) {
+	var pools []*TrackCarPool
+	err := rs.db.View(func(tx *bbolt.Tx) error {
+		bkt, err := rs.trackCarPoolBucket(tx)
+		if err == bbolt.ErrBucketNotFound {
+			return nil
+		} else if err != nil {
+			return err
+		}
+		return bkt.ForEach(func(k, v []byte) error {
+			var pool *TrackCarPool
+			if err := rs.decode(v, &pool); err != nil {
+				return err
+			}
+			if !pool.Deleted.IsZero() {
+				return nil
+			}
+			pools = append(pools, pool)
+			return nil
+		})
+	})
+	return pools, err
+}
+
+func (rs *BoltStore) DeleteTrackCarPool(id string) error {
+	pool, err := rs.LoadTrackCarPool(id)
+	if err != nil {
+		return err
+	}
+	pool.Deleted = time.Now()
+	return rs.UpsertTrackCarPool(pool)
 }
