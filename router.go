@@ -66,6 +66,7 @@ func Router(
 	kissMyRankHandler *KissMyRankHandler,
 	realPenaltyHandler *RealPenaltyHandler,
 	poolsHandler *PoolsHandler,
+	apiV1Handler *APIv1Handler,
 ) http.Handler {
 	r := chi.NewRouter()
 
@@ -99,6 +100,20 @@ func Router(
 		}
 
 		http.NotFound(w, r)
+	})
+
+	// stable JSON API for external integrations (e.g. Discord bot).
+	// Authenticated by bearer token, independent of the session-cookie auth used
+	// by the web UI.
+	r.Group(func(r chi.Router) {
+		r.Use(BearerTokenMiddleware(config.API.Tokens))
+
+		r.Get("/api/v1/server/state", apiV1Handler.serverState)
+		r.Post("/api/v1/server/restart", apiV1Handler.serverRestart)
+		r.Get("/api/v1/custom-races", apiV1Handler.listCustomRaces)
+		r.Post("/api/v1/custom-races/{uuid}/load", apiV1Handler.loadCustomRace)
+		r.Get("/api/v1/results", apiV1Handler.listResults)
+		r.Get("/api/v1/results/{file}", apiV1Handler.getResult)
 	})
 
 	// readers
