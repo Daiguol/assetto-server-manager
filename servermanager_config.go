@@ -26,6 +26,13 @@ type Configuration struct {
 	Monitoring    MonitoringConfig    `yaml:"monitoring"`
 	Championships ChampionshipsConfig `yaml:"championships"`
 	Lua           LuaConfig           `yaml:"lua"`
+	API           APIConfig           `yaml:"api"`
+}
+
+// APIConfig configures the stable JSON API exposed under /api/v1. The API is
+// disabled (returns 401 to every request) until at least one token is set.
+type APIConfig struct {
+	Tokens []string `yaml:"tokens"`
 }
 
 type ChampionshipsConfig struct {
@@ -200,6 +207,10 @@ func ReadConfig(location string) (conf *Configuration, err error) {
 
 	if config.Steam.ExecutablePath == "" {
 		config.Steam.ExecutablePath = ServerExecutablePath
+	}
+
+	if len(config.API.Tokens) > 0 {
+		logrus.Infof("API enabled: %d token(s) accepted on /api/v1/*", len(config.API.Tokens))
 	}
 
 	return conf, err
