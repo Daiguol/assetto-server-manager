@@ -584,30 +584,53 @@
                     {{ if index $.LinkedPoolIDs (.PoolID.String) }}{{ $poolPts = .Points }}{{ end }}
                 {{ end }}
 
-                <div class="mt-3">
-                    {{ if and $.IsEditing $poolPts.Places }}
-                        {{ $posCount := int64 1 }}
-                        {{ range $poolPts.Places }}
-                            <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">{{ $posCount }}{{ ordinal $posCount }} Place</label>
-                                <div class="col-sm-9">
-                                    <input type="number" class="form-control" name="PoolClassPoints.Place" value="{{ . }}">
-                                </div>
-                            </div>
-                            {{ $posCount = add $posCount 1 }}
-                        {{ end }}
-                    {{ else }}
-                        <div class="form-group row">
-                            <label class="col-sm-3 col-form-label">1st Place</label>
+                <div class="mt-3" id="pool-points-rows">
+                    {{ $posCount := int64 1 }}
+                    {{ range $poolPts.Places }}
+                        <div class="form-group row pool-points-row">
+                            <label class="col-sm-3 col-form-label">{{ $posCount }}{{ ordinal $posCount }} Place</label>
                             <div class="col-sm-9">
-                                <input type="number" class="form-control" name="PoolClassPoints.Place"
-                                       value="{{ index $.DefaultPoints.Places 0 }}">
+                                <input type="number" class="form-control" name="PoolClassPoints.Place" value="{{ . }}">
                             </div>
                         </div>
+                        {{ $posCount = add $posCount 1 }}
                     {{ end }}
-                    <input type="hidden" name="NumPoolClassPoints"
-                           value="{{ if and $.IsEditing $poolPts.Places }}{{ len $poolPts.Places }}{{ else }}1{{ end }}">
                 </div>
+                <input type="hidden" id="NumPoolClassPoints" name="NumPoolClassPoints" value="{{ len $poolPts.Places }}">
+                <div class="row mb-2">
+                    <div class="col-sm-9 offset-sm-3">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="pool-add-place">+ Add Position</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger ml-1" id="pool-remove-place">− Remove Last</button>
+                    </div>
+                </div>
+                <script>
+                (function() {
+                    var defaultPts = {{ $.DefaultPoints.Places }};
+                    function updateCount() {
+                        var rows = document.querySelectorAll('#pool-points-rows .pool-points-row');
+                        document.getElementById('NumPoolClassPoints').value = rows.length;
+                    }
+                    document.getElementById('pool-add-place').addEventListener('click', function() {
+                        var rows = document.querySelectorAll('#pool-points-rows .pool-points-row');
+                        var pos = rows.length + 1;
+                        var pts = pos <= defaultPts.length ? defaultPts[pos - 1] : 0;
+                        var div = document.createElement('div');
+                        div.className = 'form-group row pool-points-row';
+                        div.innerHTML = '<label class="col-sm-3 col-form-label">' + pos + ordSuffix(pos) + ' Place</label>'
+                            + '<div class="col-sm-9"><input type="number" class="form-control" name="PoolClassPoints.Place" value="' + pts + '"></div>';
+                        document.getElementById('pool-points-rows').appendChild(div);
+                        updateCount();
+                    });
+                    document.getElementById('pool-remove-place').addEventListener('click', function() {
+                        var rows = document.querySelectorAll('#pool-points-rows .pool-points-row');
+                        if (rows.length > 1) { rows[rows.length - 1].remove(); updateCount(); }
+                    });
+                    function ordSuffix(n) {
+                        var s = ['th','st','nd','rd'], v = n % 100;
+                        return (s[(v-20)%10] || s[v] || s[0]);
+                    }
+                })();
+                </script>
 
                 <div class="form-group row mt-2">
                     <label class="col-sm-3 col-form-label">Best Lap</label>

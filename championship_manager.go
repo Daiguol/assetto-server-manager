@@ -745,6 +745,10 @@ func (cm *ChampionshipManager) StartPracticeEvent(championshipID string, eventID
 func (cm *ChampionshipManager) FinalEventConfigurationFiles(championship *Championship, event *ChampionshipEvent, isPreChampionshipPracticeEvent bool) (CurrentRaceConfig, EntryList) {
 	raceSetup := event.RaceSetup
 
+	// Ensure AvailableCars is populated for any pool-linked class before any
+	// path that calls ValidCarIDs() or iterates over class cars.
+	cm.enrichClassesWithPoolCars(championship)
+
 	// If the event is scoped to a specific class, restrict cars and entry list to that class only.
 	if event.ClassID != uuid.Nil {
 		for _, class := range championship.Classes {
@@ -793,12 +797,16 @@ func (cm *ChampionshipManager) FinalEventConfigurationFiles(championship *Champi
 				for i := 0; i < numSlots; i++ {
 					e := NewEntrant()
 					e.Model = availableCars[i%len(availableCars)]
+					e.Skin = cm.carManager.RandomSkin(e.Model)
 					entryList.AddToBackOfGrid(e)
 				}
 			} else {
 				// Closed entry list: only pre-registered class entrants.
 				entryList = make(EntryList)
 				for _, entrant := range class.Entrants.AsSlice() {
+					if entrant.Skin == "" && entrant.Model != "" {
+						entrant.Skin = cm.carManager.RandomSkin(entrant.Model)
+					}
 					entryList.AddToBackOfGrid(entrant)
 				}
 
@@ -825,6 +833,13 @@ func (cm *ChampionshipManager) FinalEventConfigurationFiles(championship *Champi
 	raceSetup.Cars = strings.Join(championship.ValidCarIDs(), ";")
 
 	entryList := event.CombineEntryLists(championship)
+
+	// Ensure every entrant has a skin (may be empty for open/pool championships).
+	for _, entrant := range entryList {
+		if entrant.Skin == "" && entrant.Model != "" {
+			entrant.Skin = cm.carManager.RandomSkin(entrant.Model)
+		}
+	}
 
 	if championship.HasSpectatorCar() {
 		entryList.AddInPitBox(&championship.SpectatorCar, maxEntryListSize+1)
@@ -1320,6 +1335,7 @@ func (cm *ChampionshipManager) handleSessionChanges(message udp.Message, champio
 		}
 
 		// Update the old results json file with more championship information, required for applying penalties properly
+		cm.enrichClassesWithPoolCars(championship)
 		championship.EnhanceResults(results)
 		err = saveResults(filename, results)
 
@@ -1633,6 +1649,7 @@ func (cm *ChampionshipManager) ImportEvent(championshipID string, eventID string
 			}
 		}
 
+		cm.enrichClassesWithPoolCars(championship)
 		championship.EnhanceResults(results)
 
 		if err := saveResults(sessionFile+".json", results); err != nil {
@@ -1651,8 +1668,26 @@ func (cm *ChampionshipManager) ImportEvent(championshipID string, eventID string
 	return cm.UpsertChampionship(championship)
 }
 
+// enrichClassesWithPoolCars populates class.AvailableCars from the associated pool
+// for any pool-linked class that has no AvailableCars set. This allows FindClassForCarModel
+// to correctly map pool cars to their class during live sessions.
+func (cm *ChampionshipManager) enrichClassesWithPoolCars(championship *Championship) {
+	for _, class := range championship.Classes {
+		if class.PoolID == uuid.Nil || len(class.AvailableCars) > 0 {
+			continue
+		}
+		pool, err := cm.store.LoadTrackCarPool(class.PoolID.String())
+		if err != nil || len(pool.Cars) == 0 {
+			continue
+		}
+		class.AvailableCars = pool.Cars
+	}
+}
+
 func (cm *ChampionshipManager) AddEntrantFromSessionData(championship *Championship, potentialEntrant PotentialChampionshipEntrant, overwriteSkinForAllEvents bool, takeFirstFreeSlot bool) (foundFreeEntrantSlot bool, entrantClass *ChampionshipClass, err error) {
 	var entrant *Entrant
+
+	cm.enrichClassesWithPoolCars(championship)
 
 	if takeFirstFreeSlot {
 		foundFreeEntrantSlot, entrant, entrantClass, err = championship.AddEntrantInFirstFreeSlot(potentialEntrant)

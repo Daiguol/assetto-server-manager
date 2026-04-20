@@ -1,0 +1,34 @@
+# Stage 1: Compile TypeScript assets using Node.js 12 (outputs to ../static/)
+FROM node:12-bullseye-slim AS ts-build
+
+ENV BUILD_DIR /go/src/github.com/JustaPenguin/assetto-server-manager
+WORKDIR ${BUILD_DIR}
+ADD . .
+
+RUN cd cmd/server-manager/typescript && npm install && ./node_modules/.bin/gulp build
+
+# Stage 2: Build the Go binary with embedded assets
+FROM golang:1.21 AS go-build
+
+ENV BUILD_DIR /go/src/github.com/JustaPenguin/assetto-server-manager
+ENV GO111MODULE on
+
+WORKDIR ${BUILD_DIR}
+# Copy source tree WITH compiled static assets from ts-build stage
+COPY --from=ts-build ${BUILD_DIR} .
+
+# Build esc from the project's own pinned module versions, then generate embed files
+RUN GOFLAGS=-mod=mod go build -o /usr/local/bin/esc github.com/mjibson/esc
+RUN go generate ./...
+
+# Build the Linux binary
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+    go build -trimpath -a -installsuffix cgo \
+    -ldflags="-s -w" \
+    -o /usr/bin/server-manager \
+    ./cmd/server-manager
+
+# Stage 3: Use the existing runtime image — just replace the binary
+FROM seejy/assetto-server-manager:latest
+
+COPY --from=go-build /usr/bin/server-manager /usr/bin/server-manager

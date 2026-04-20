@@ -622,8 +622,10 @@ func contentManagerIDChecksum(guid string) (string, error) {
 }
 
 var geoIPData *GeoIP
+var geoIPFetchedAt time.Time
 
 const geoIPURL = "https://geoip.cj.workers.dev"
+const geoIPTTL = 5 * time.Minute
 
 type GeoIP struct {
 	CountryCode string `json:"country_code"`
@@ -632,7 +634,7 @@ type GeoIP struct {
 }
 
 func geoIP() (*GeoIP, error) {
-	if geoIPData != nil {
+	if geoIPData != nil && time.Since(geoIPFetchedAt) < geoIPTTL {
 		return geoIPData, nil
 	}
 
@@ -644,9 +646,12 @@ func geoIP() (*GeoIP, error) {
 
 	defer resp.Body.Close()
 
+	geoIPData = nil
 	if err := json.NewDecoder(resp.Body).Decode(&geoIPData); err != nil {
 		return nil, err
 	}
+
+	geoIPFetchedAt = time.Now()
 
 	return geoIPData, nil
 }

@@ -179,16 +179,15 @@
         const trackID = trackSelect.value;
         if (!trackID) return;
 
-        // The layout dropdown is managed by ACSM JS:
-        // - If visible, its value is "trackID:layoutID"
-        // - If hidden, no layout needed
+        // After ACSM JS initialises the track picker, it rebuilds #TrackLayout options
+        // using buildTrackLayoutOption(layout, name) where value = layout ID only
+        // (e.g. "international"), NOT the original "trackID:layoutID" template format.
+        // So we read the value directly — no split needed.
         const layoutParent = layoutSelect.closest('.form-group');
         const isLayoutVisible = layoutParent && layoutParent.style.display !== 'none';
         let layoutID = '';
         if (isLayoutVisible && layoutSelect.value) {
-            // value format: "trackID:layoutID"  →  take everything after first ":"
-            const parts = layoutSelect.value.split(':');
-            layoutID = parts.slice(1).join(':');
+            layoutID = layoutSelect.value;
         }
 
         // Auto display name: selected text + layout text

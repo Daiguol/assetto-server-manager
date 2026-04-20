@@ -4,8 +4,11 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"time"
@@ -1246,7 +1249,7 @@ func (ch *ChampionshipsHandler) generateRandomEvents(w http.ResponseWriter, r *h
 		event.ClassID = classID
 		event.RaceSetup = *raceConfig
 		event.RaceSetup.Track = pt.Track
-		event.RaceSetup.TrackLayout = pt.Layout
+		event.RaceSetup.TrackLayout = resolveTrackLayout(pt.Track, pt.Layout)
 
 		classBuckets[classID] = append(classBuckets[classID], event)
 	}
@@ -1276,4 +1279,40 @@ func (ch *ChampionshipsHandler) generateRandomEvents(w http.ResponseWriter, r *h
 
 	AddFlash(w, r, fmt.Sprintf("Generated %d random event(s) from pools!", created))
 	http.Redirect(w, r, "/championship/"+championshipID, http.StatusFound)
+}
+
+// resolveTrackLayout returns layout if non-empty. Otherwise it inspects the track
+// directory and returns the first valid sublayout (has data/surfaces.ini). This
+// prevents events from being generated with an empty layout on multi-layout tracks,
+// which would cause wrong spawn positions and missing map images.
+func resolveTrackLayout(track, layout string) string {
+	if layout != "" {
+		return layout
+	}
+	tracksPath := filepath.Join(ServerInstallPath, "content", "tracks")
+	trackDir := filepath.Join(tracksPath, track)
+
+	// If the track has a root data/surfaces.ini it is a single-layout track — keep "".
+	if _, err := os.Stat(filepath.Join(trackDir, "data", "surfaces.ini")); err == nil {
+		return ""
+	}
+
+	// Multi-layout track: pick the first subdirectory with data/surfaces.ini.
+	entries, err := ioutil.ReadDir(trackDir)
+	if err != nil {
+		return ""
+	}
+	for _, e := range entries {
+		if !e.IsDir() {
+			continue
+		}
+		switch e.Name() {
+		case "data", "ui":
+			continue
+		}
+		if _, err := os.Stat(filepath.Join(trackDir, e.Name(), "data", "surfaces.ini")); err == nil {
+			return e.Name()
+		}
+	}
+	return ""
 }

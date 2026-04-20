@@ -918,6 +918,19 @@ func (c *Championship) AddEntrantFromSession(potentialEntrant PotentialChampions
 		}
 	}
 
+	// Pool-linked open class: class.Entrants is empty but AvailableCars was populated
+	// by enrichClassesWithPoolCars. Create a new slot on the fly so the entrant is
+	// tracked for championship standings.
+	if len(classForCar.AvailableCars) > 0 {
+		newEntrant := NewEntrant()
+		newEntrant.Model = potentialEntrant.GetCar()
+		classForCar.AssignToFreeEntrantSlot(newEntrant, potentialEntrant)
+		classForCar.Entrants.AddToBackOfGrid(newEntrant)
+		logrus.Infof("Championship entrant: %s (%s) added to pool-class %s (new slot)", newEntrant.Name, newEntrant.GUID, c.Name)
+
+		return true, newEntrant, classForCar, nil
+	}
+
 	return false, nil, classForCar, nil
 }
 
