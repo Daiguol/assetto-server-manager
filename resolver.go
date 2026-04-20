@@ -51,6 +51,7 @@ type Resolver struct {
 	kissMyRankHandler           *KissMyRankHandler
 	realPenaltyHandler          *RealPenaltyHandler
 	poolsHandler                *PoolsHandler
+	apiV1Handler                *APIv1Handler
 }
 
 func NewResolver(templateLoader TemplateLoader, reloadTemplates bool, store Store) (*Resolver, error) {
@@ -531,6 +532,21 @@ func (r *Resolver) resolvePoolsHandler() *PoolsHandler {
 	return r.poolsHandler
 }
 
+func (r *Resolver) resolveAPIv1Handler() *APIv1Handler {
+	if r.apiV1Handler != nil {
+		return r.apiV1Handler
+	}
+
+	r.apiV1Handler = NewAPIv1Handler(
+		r.ResolveStore(),
+		r.resolveRaceManager(),
+		r.resolveServerProcess(),
+		r.ResolveRaceControl(),
+	)
+
+	return r.apiV1Handler
+}
+
 func (r *Resolver) ResolveRouter(fs http.FileSystem) http.Handler {
 	return Router(
 		fs,
@@ -554,6 +570,7 @@ func (r *Resolver) ResolveRouter(fs http.FileSystem) http.Handler {
 		r.resolveKissMyRankHandler(),
 		r.resolveRealPenaltyHandler(),
 		r.resolvePoolsHandler(),
+		r.resolveAPIv1Handler(),
 	)
 }
 
