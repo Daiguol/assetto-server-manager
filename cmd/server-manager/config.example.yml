@@ -286,3 +286,17 @@ lua:
   # folder to see some examples!
   # Lua plugins are a premium feature, they won't run without the premium build!
   enabled: false
+
+################################################################################
+#
+#  api - stable JSON API for external integrations (e.g. Discord bot)
+#
+################################################################################
+api:
+  # tokens accepted by the /api/v1/* endpoints. Each request must include an
+  # "Authorization: Bearer <token>" header that matches one of these values.
+  # If this list is empty, the API is disabled (every request returns 401).
+  # Generate strong tokens (e.g. `openssl rand -hex 32`) and treat them as
+  # secrets — anyone with a token can start races and restart the server.
+  tokens: []
+    # - your-strong-random-token-here
