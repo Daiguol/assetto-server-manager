@@ -24,7 +24,6 @@ import (
 	"github.com/cj123/watcher"
 	"github.com/dimchansky/utfbom"
 	"github.com/go-chi/chi"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
@@ -733,7 +732,7 @@ func (cm *CarManager) Search(ctx context.Context, term string, from, size int) (
 		car, err := cm.LoadCar(hit.ID, nil)
 
 		if err != nil {
-			return nil, nil, errors.Wrap(err, hit.ID)
+			return nil, nil, fmt.Errorf("%s: %w", hit.ID, err)
 		}
 
 		cars = append(cars, car)

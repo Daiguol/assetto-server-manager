@@ -3,6 +3,7 @@ package servermanager
 import (
 	"bytes"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"html/template"
 	"math/rand"
@@ -11,7 +12,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/teambition/rrule-go"
 )
