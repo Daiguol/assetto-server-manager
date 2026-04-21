@@ -1,0 +1,24 @@
+# Template for docker-compose.yml.
+#
+# Copy this file to docker-compose.yml (gitignored) and adjust ports, volumes
+# and any env vars for your deployment.
+
+services:
+  acsm:
+    build:
+      context: .
+      args:
+        SM_VERSION: ${SM_VERSION:-dev}
+    image: acsm:${SM_VERSION:-dev}
+    container_name: acsm
+    restart: unless-stopped
+    ports:
+      - "8772:8772" # web UI
+      - "8081:8081" # HTTP plugin / live timing
+      - "9600:9600/udp" # acServer UDP plugin
+    volumes:
+      - acsm-data:/home/assetto/server-manager
+      - ./config.yml:/home/assetto/server-manager/config.yml:ro
+
+volumes:
+  acsm-data:

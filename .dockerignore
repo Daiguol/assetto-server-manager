@@ -1,4 +1,33 @@
+.git
+.gitignore
+.github
+.idea
+.vscode
+.claude
+
+# build outputs and local runtime state
 cmd/server-manager/assetto/
+cmd/server-manager/build/
+cmd/server-manager/server-manager
+cmd/server-manager/server-manager.exe
+cmd/server-manager/static/js/
+cmd/server-manager/static/css/
+cmd/server-manager/static/static_embed.go
+cmd/server-manager/views/static_embed.go
+internal/changelog/changelog_embed.go
+changelog_embed.go
 server-install
 *.log
+*.syso
+*.map
+
+# Node modules are reinstalled inside the assets stage
 node_modules
+
+# Local docker-compose overrides — only the example is used at build time
+docker-compose.yml
+docker-compose.override.yml
+
+# Config is bind-mounted at runtime, not baked into the image
+config.yml
+server_manager.db

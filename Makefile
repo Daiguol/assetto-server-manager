@@ -44,10 +44,21 @@ deploy: clean generate vet test
 run:
 	$(MAKE) -C cmd/server-manager run
 
+# Build a local Docker image. Override IMAGE=your/repo to push elsewhere.
+IMAGE?=acsm
+
 docker:
-	docker build --build-arg SM_VERSION=${VERSION} -t seejy/assetto-server-manager:${VERSION} .
-	docker push seejy/assetto-server-manager:${VERSION}
+	docker build --build-arg SM_VERSION=${VERSION} -t ${IMAGE}:${VERSION} .
 ifneq ("${VERSION}", "unstable")
-	docker tag seejy/assetto-server-manager:${VERSION} seejy/assetto-server-manager:latest
-	docker push seejy/assetto-server-manager:latest
+	docker tag ${IMAGE}:${VERSION} ${IMAGE}:latest
 endif
+
+docker-push:
+	docker push ${IMAGE}:${VERSION}
+ifneq ("${VERSION}", "unstable")
+	docker push ${IMAGE}:latest
+endif
+
+compose:
+	docker compose build
+	docker compose up -d

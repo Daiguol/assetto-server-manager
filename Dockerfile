@@ -1,62 +1,109 @@
-FROM golang:1.15 AS build
+# syntax=docker/dockerfile:1.6
 
-ARG SM_VERSION
-ENV DEBIAN_FRONTEND noninteractive
-ENV BUILD_DIR ${GOPATH}/src/github.com/JustaPenguin/assetto-server-manager
-ENV GO111MODULE on
+# -----------------------------------------------------------------------------
+# Stage 1: Frontend assets
+#
+# Node 14 is the last version compatible with node-sass@4 (still a dep until the
+# frontend-modernization phase). This stage is isolated so the legacy toolchain
+# never leaks into the runtime image.
+# -----------------------------------------------------------------------------
+FROM node:14-bullseye-slim AS assets
 
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
-RUN apt-get update && apt-get install -y build-essential libssl-dev curl nodejs tofrodos dos2unix zip
+WORKDIR /src/cmd/server-manager/typescript
 
-ADD . ${BUILD_DIR}
-WORKDIR ${BUILD_DIR}
-RUN rm -rf cmd/server-manager/typescript/node_modules
-RUN VERSION=${SM_VERSION} make deploy
-RUN mv cmd/server-manager/build/linux/server-manager /usr/bin/
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends python3 build-essential \
+ && rm -rf /var/lib/apt/lists/*
+ENV PYTHON=/usr/bin/python3
 
-FROM ubuntu:18.04 AS run
-MAINTAINER Callum Jones <cj@icj.me>
+COPY cmd/server-manager/typescript/package.json \
+     cmd/server-manager/typescript/package-lock.json \
+     ./
+RUN npm install --no-audit --no-fund
 
-ENV DEBIAN_FRONTEND noninteractive
+COPY cmd/server-manager/typescript/ ./
+RUN ./node_modules/.bin/gulp build
 
-ENV SERVER_USER assetto
-ENV SERVER_MANAGER_DIR /home/${SERVER_USER}/server-manager/
-ENV SERVER_INSTALL_DIR ${SERVER_MANAGER_DIR}/assetto
-ENV LANG C.UTF-8
 
-ENV STEAMCMD_URL="http://media.steampowered.com/installer/steamcmd_linux.tar.gz"
-ENV STEAMROOT=/opt/steamcmd
+# -----------------------------------------------------------------------------
+# Stage 2: Go binary
+#
+# Compiles the server-manager with embedded assets. `esc` is installed from the
+# module proxy (go.mod-aware, no GOPATH side effects) — this replaces the
+# legacy `go get -u` in the Makefile's generate target.
+# -----------------------------------------------------------------------------
+FROM golang:1.25-bookworm AS gobuilder
 
-# steamcmd
-RUN curl -sL https://deb.nodesource.com/setup_11.x | bash -
-RUN apt-get update && apt-get install -y build-essential libssl-dev curl lib32gcc1 lib32stdc++6 nodejs
-RUN mkdir -p ${STEAMROOT}
-WORKDIR ${STEAMROOT}
-RUN curl -s ${STEAMCMD_URL} | tar -vxz
-ENV PATH "${STEAMROOT}:${PATH}"
+ARG SM_VERSION=dev
+ENV CGO_ENABLED=0
 
-# update steam
-RUN steamcmd.sh +login anonymous +quit; exit 0
+WORKDIR /src
 
-# dependencies for plugins, e.g. stracker, kissmyrank
-RUN apt-get update && apt-get install -y lib32gcc1 lib32stdc++6 zlib1g zlib1g lib32z1 ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY go.mod go.sum ./
+RUN go mod download
 
-RUN useradd -ms /bin/bash ${SERVER_USER}
+# esc is legacy (removed in Phase 2); pin to v0.2.0 which does not pull
+# golang.org/x/tools versions that require a newer toolchain.
+RUN go install github.com/mjibson/esc@v0.2.0
 
-RUN mkdir -p ${SERVER_MANAGER_DIR} && mkdir ${SERVER_INSTALL_DIR}
+COPY . .
 
-RUN chown -R ${SERVER_USER}:${SERVER_USER} ${SERVER_MANAGER_DIR}
-RUN chown -R ${SERVER_USER}:${SERVER_USER} ${SERVER_INSTALL_DIR}
+# Overlay the frontend bundle/css generated in stage 1 on top of the static
+# directory — only the generated files are copied; favicon, img/ and static.go
+# remain from the source tree.
+COPY --from=assets /src/cmd/server-manager/static/js  ./cmd/server-manager/static/js
+COPY --from=assets /src/cmd/server-manager/static/css ./cmd/server-manager/static/css
 
-COPY --from=build /usr/bin/server-manager /usr/bin/
+RUN go generate ./...
+
+RUN go build -trimpath \
+      -ldflags="-s -w -X github.com/JustaPenguin/assetto-server-manager.BuildVersion=${SM_VERSION}" \
+      -o /out/server-manager \
+      ./cmd/server-manager
+
+
+# -----------------------------------------------------------------------------
+# Stage 3: Runtime
+#
+# debian:12-slim with 32-bit libs for SteamCMD (dedicated server binary is 32
+# bit). lib32gcc-s1 replaces the EOL lib32gcc1 name used on Ubuntu 18.04.
+# -----------------------------------------------------------------------------
+FROM debian:12-slim AS runtime
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    STEAMROOT=/opt/steamcmd \
+    SERVER_USER=assetto \
+    SERVER_MANAGER_DIR=/home/assetto/server-manager \
+    SERVER_INSTALL_DIR=/home/assetto/server-manager/assetto
+
+RUN dpkg --add-architecture i386 \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends \
+      ca-certificates curl tzdata \
+      lib32gcc-s1 lib32stdc++6 \
+      libc6:i386 libstdc++6:i386 zlib1g:i386 \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p ${STEAMROOT} \
+ && curl -fsSL https://media.steampowered.com/installer/steamcmd_linux.tar.gz \
+    | tar -xz -C ${STEAMROOT}
+ENV PATH="${STEAMROOT}:${PATH}"
+
+RUN useradd -ms /bin/bash ${SERVER_USER} \
+ && mkdir -p ${SERVER_MANAGER_DIR} ${SERVER_INSTALL_DIR} \
+ && chown -R ${SERVER_USER}:${SERVER_USER} /home/${SERVER_USER}
+
+COPY --from=gobuilder /out/server-manager /usr/local/bin/server-manager
 
 USER ${SERVER_USER}
 WORKDIR ${SERVER_MANAGER_DIR}
 
-# recommend volume mounting the entire assetto corsa directory
-VOLUME ["${SERVER_INSTALL_DIR}"]
-EXPOSE 8772
-EXPOSE 9600
-EXPOSE 8081
+VOLUME ["${SERVER_MANAGER_DIR}"]
+
+EXPOSE 8772 9600/udp 8081
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD curl -fsS http://localhost:8772/healthcheck.json || exit 1
 
 ENTRYPOINT ["server-manager"]
