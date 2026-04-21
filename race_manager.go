@@ -18,7 +18,7 @@ import (
 
 	"4d63.com/tz"
 	"github.com/etcd-io/bbolt"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )

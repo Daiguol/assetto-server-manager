@@ -17,7 +17,7 @@ require (
 	github.com/etcd-io/bbolt v1.3.3
 	github.com/fatih/color v1.7.0
 	github.com/getsentry/raven-go v0.2.0
-	github.com/go-chi/chi v4.0.3+incompatible
+	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-http-utils/etag v0.0.0-20161124023236-513ea8f21eb1
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/websocket v1.4.1
