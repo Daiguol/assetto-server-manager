@@ -28,7 +28,6 @@ require (
 	github.com/lorenzosaino/go-sysctl v0.1.0
 	github.com/mattn/go-zglob v0.0.1
 	github.com/mitchellh/go-wordwrap v1.0.0
-	github.com/mjibson/esc v0.2.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
 	github.com/pkg/errors v0.9.1
@@ -93,10 +92,7 @@ require (
 	github.com/willf/bitset v1.1.10 // indirect
 	github.com/yosssi/gohtml v0.0.0-20200519115854-476f5b4b8047 // indirect
 	go.etcd.io/bbolt v1.3.2 // indirect
-	golang.org/x/mod v0.3.0 // indirect
 	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
-	golang.org/x/tools v0.0.0-20200911193555-6422fca01df9 // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/ini.v1 v1.42.0 // indirect
 )
 

@@ -28,11 +28,10 @@ RUN ./node_modules/.bin/gulp build
 # -----------------------------------------------------------------------------
 # Stage 2: Go binary
 #
-# Compiles the server-manager with embedded assets. `esc` is installed from the
-# module proxy (go.mod-aware, no GOPATH side effects) — this replaces the
-# legacy `go get -u` in the Makefile's generate target.
+# Compiles the server-manager with embedded assets (//go:embed — no generate
+# step, no external tooling).
 # -----------------------------------------------------------------------------
-FROM golang:1.25-bookworm AS gobuilder
+FROM golang:1.23-bookworm AS gobuilder
 
 ARG SM_VERSION=dev
 ENV CGO_ENABLED=0
@@ -42,10 +41,6 @@ WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 
-# esc is legacy (removed in Phase 2); pin to v0.2.0 which does not pull
-# golang.org/x/tools versions that require a newer toolchain.
-RUN go install github.com/mjibson/esc@v0.2.0
-
 COPY . .
 
 # Overlay the frontend bundle/css generated in stage 1 on top of the static
@@ -53,8 +48,6 @@ COPY . .
 # remain from the source tree.
 COPY --from=assets /src/cmd/server-manager/static/js  ./cmd/server-manager/static/js
 COPY --from=assets /src/cmd/server-manager/static/css ./cmd/server-manager/static/css
-
-RUN go generate ./...
 
 RUN go build -trimpath \
       -ldflags="-s -w -X github.com/JustaPenguin/assetto-server-manager.BuildVersion=${SM_VERSION}" \

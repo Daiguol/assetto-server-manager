@@ -6,15 +6,9 @@ import (
 	"github.com/russross/blackfriday"
 )
 
-// Pack changelog into this package
-//go:generate esc -o changelog_embed.go -pkg=changelog ../../CHANGELOG.md
-
-func LoadChangelog() (template.HTML, error) {
-	changelog, err := FSByte(false, "/CHANGELOG.md")
-
-	if err != nil {
-		return "", err
-	}
-
-	return template.HTML(blackfriday.Run(changelog)), nil
+// Render converts the raw markdown changelog into safe HTML for display in
+// the admin UI. The bytes typically come from the embedded CHANGELOG.md in
+// the root servermanager package.
+func Render(src []byte) template.HTML {
+	return template.HTML(blackfriday.Run(src))
 }

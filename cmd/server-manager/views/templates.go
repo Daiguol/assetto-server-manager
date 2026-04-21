@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"html/template"
 	"io"
+	"io/fs"
 	"path/filepath"
 	"strings"
 )
@@ -13,28 +14,28 @@ type TemplateLoader struct {
 }
 
 func (t *TemplateLoader) Init() error {
-	for fname, data := range _escData {
-		if data.IsDir() {
-			continue
+	return fs.WalkDir(embedded, ".", func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
 		}
-
-		if strings.HasPrefix(fname, "/pages/") {
-			t.pages = append(t.pages, fname)
-		} else if strings.HasPrefix(fname, "/partials/") {
-			t.partials = append(t.partials, fname)
+		if d.IsDir() {
+			return nil
 		}
-	}
-
-	return nil
+		key := "/" + filepath.ToSlash(p)
+		if strings.HasPrefix(key, "/pages/") {
+			t.pages = append(t.pages, key)
+		} else if strings.HasPrefix(key, "/partials/") {
+			t.partials = append(t.partials, key)
+		}
+		return nil
+	})
 }
 
 func (t *TemplateLoader) fileContents(name string) (string, error) {
-	f, err := _escStatic.Open(name)
-
+	f, err := embedded.Open(strings.TrimPrefix(name, "/"))
 	if err != nil {
 		return "", err
 	}
-
 	defer f.Close()
 
 	buf := new(bytes.Buffer)

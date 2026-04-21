@@ -12,7 +12,6 @@ install-linter:
 	which golangci-lint || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.27.0
 
 clean:
-	rm -rf changelog_embed.go
 	$(MAKE) -C cmd/server-manager clean
 
 test:
@@ -21,24 +20,17 @@ test:
 	cp -R fixtures/results/*.json cmd/server-manager/assetto/results
 	go test -race
 
-vet: install-linter generate
+vet: install-linter
 	go vet ./...
 	golangci-lint -E bodyclose,misspell,gofmt,golint,unconvert,goimports,depguard,interfacer run --timeout 30m --skip-files content_cars_skins.go,plugin_kissmyrank_config.go,plugin_realpenalty_config.go
-
-generate:
-	go get -u github.com/mjibson/esc
-	go generate ./...
 
 assets:
 	$(MAKE) -C cmd/server-manager assets
 
-asset-embed: generate
-	$(MAKE) -C cmd/server-manager asset-embed
-
 build:
 	$(MAKE) -C cmd/server-manager build
 
-deploy: clean generate vet test
+deploy: clean vet test
 	$(MAKE) -C cmd/server-manager deploy
 
 run:

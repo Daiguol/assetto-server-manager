@@ -12,10 +12,6 @@ cmd/server-manager/server-manager
 cmd/server-manager/server-manager.exe
 cmd/server-manager/static/js/
 cmd/server-manager/static/css/
-cmd/server-manager/static/static_embed.go
-cmd/server-manager/views/static_embed.go
-internal/changelog/changelog_embed.go
-changelog_embed.go
 server-install
 *.log
 *.syso

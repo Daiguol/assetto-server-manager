@@ -1,4 +1,8 @@
+// Package views embeds the HTML templates (layouts, pages, partials) used to
+// render the web UI.
 package views
 
-// Pack frontend compiled assets into this package
-//go:generate esc -o static_embed.go -pkg=views .
+import "embed"
+
+//go:embed layout pages partials
+var embedded embed.FS
