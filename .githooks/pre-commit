@@ -1,0 +1,23 @@
+#!/bin/sh
+# Pre-commit: block commits that would break the lint baseline.
+#
+# Activation (per clone): git config core.hooksPath .githooks
+# Bypass (rare):          git commit --no-verify
+
+set -e
+
+STAGED_GO=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.go$' || true)
+if [ -z "$STAGED_GO" ]; then
+	exit 0
+fi
+
+echo "pre-commit: go vet"
+go vet ./...
+
+if ! command -v golangci-lint >/dev/null 2>&1; then
+	echo "pre-commit: golangci-lint not on PATH. Run 'make install-linter'." >&2
+	exit 1
+fi
+
+echo "pre-commit: golangci-lint"
+golangci-lint run ./...

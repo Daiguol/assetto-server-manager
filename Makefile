@@ -15,6 +15,10 @@ install-linter:
 		go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION); \
 	fi
 
+install-hooks:
+	git config core.hooksPath .githooks
+	@echo "pre-commit hook active. Bypass with 'git commit --no-verify'."
+
 clean:
 	$(MAKE) -C cmd/server-manager clean
 
