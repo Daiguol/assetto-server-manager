@@ -12,5 +12,7 @@ build/
 *.zip
 *.log
 static/js/bundle.js
-static/css
+static/js/bundle.js.map
+static/css/*
+!static/css/.gitkeep
 typescript/.gulp-cache
