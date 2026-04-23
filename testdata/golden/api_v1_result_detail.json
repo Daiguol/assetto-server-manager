@@ -1,0 +1,540 @@
+{
+  "Cars": [
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198020046073",
+        "GuidsList": [
+          "76561198020046073"
+        ],
+        "Name": "Callum Jones",
+        "Nation": "ABW",
+        "Team": "Wrong Bizniz Racing"
+      },
+      "Model": "rss_formula_rss_4",
+      "Restrictor": 0,
+      "Skin": "14_Outback_Stars"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198029578060",
+        "GuidsList": [
+          "76561198029578060"
+        ],
+        "Name": "Joseph Elton",
+        "Nation": "GBR",
+        "Team": "Dude, where's my wang!?"
+      },
+      "Model": "rss_formula_rss_4",
+      "Restrictor": 0,
+      "Skin": "06_Smith_Racing"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 2,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198022717360",
+        "GuidsList": [
+          "76561198022717360"
+        ],
+        "Name": "Henry Spencer",
+        "Nation": "",
+        "Team": "Wrong Bizniz Racing"
+      },
+      "Model": "rss_formula_rss_4",
+      "Restrictor": 0,
+      "Skin": "07_Chinese_Dragons"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 3,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198023931313",
+        "GuidsList": [
+          "76561198023931313"
+        ],
+        "Name": "Danny Wilson",
+        "Nation": "",
+        "Team": "Catch My Drift"
+      },
+      "Model": "rss_formula_rss_4",
+      "Restrictor": 0,
+      "Skin": "17_Carbon_Realistic"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 4,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198055388877",
+        "GuidsList": [
+          "76561198055388877"
+        ],
+        "Name": "Lee Crossley",
+        "Nation": "",
+        "Team": "Catch My Drift"
+      },
+      "Model": "rss_formula_rss_4",
+      "Restrictor": 0,
+      "Skin": "15_White"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 5,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198256908075",
+        "GuidsList": [
+          "76561198256908075"
+        ],
+        "Name": "Bradley Ward",
+        "Nation": "",
+        "Team": "Purple Helmets"
+      },
+      "Model": "rss_formula_rss_4",
+      "Restrictor": 0,
+      "Skin": "19_Black"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 6,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198247914110",
+        "GuidsList": [
+          "76561198247914110"
+        ],
+        "Name": "Jayan Mistry",
+        "Nation": "",
+        "Team": "Purple Helmets"
+      },
+      "Model": "rss_formula_rss_4",
+      "Restrictor": 0,
+      "Skin": "09_Nacho_Racing"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 7,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198084281699",
+        "GuidsList": [
+          "76561198084281699"
+        ],
+        "Name": "Warren Pilz",
+        "Nation": "",
+        "Team": "Dude, where's my wang!?"
+      },
+      "Model": "rss_formula_rss_4",
+      "Restrictor": 0,
+      "Skin": "85_Greenery_FH"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 8,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198074322763",
+        "GuidsList": [
+          "76561198074322763"
+        ],
+        "Name": "Sebastian Townsend",
+        "Nation": "",
+        "Team": ""
+      },
+      "Model": "rss_formula_rss_4",
+      "Restrictor": 0,
+      "Skin": "15_White"
+    }
+  ],
+  "ChampionshipID": "",
+  "Date": "2019-02-15T21:16:00+01:00",
+  "Events": [
+    {
+      "CarId": 1,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198029578060",
+        "GuidsList": [
+          "76561198029578060"
+        ],
+        "Name": "Joseph Elton",
+        "Nation": "GBR",
+        "Team": "Dude, where's my wang!?"
+      },
+      "ImpactSpeed": 3.39687,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198020046073",
+        "GuidsList": [
+          "76561198020046073"
+        ],
+        "Name": "Callum Jones",
+        "Nation": "ABW",
+        "Team": "Wrong Bizniz Racing"
+      },
+      "RelPosition": {
+        "X": -0.06472139,
+        "Y": 0.0060657416,
+        "Z": 2.3283312
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -401.18503,
+        "Y": 7.9383554,
+        "Z": 5.881806
+      }
+    },
+    {
+      "CarId": 0,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198020046073",
+        "GuidsList": [
+          "76561198020046073"
+        ],
+        "Name": "Callum Jones",
+        "Nation": "ABW",
+        "Team": "Wrong Bizniz Racing"
+      },
+      "ImpactSpeed": 9.053193,
+      "OtherCarId": 1,
+      "OtherDriver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198029578060",
+        "GuidsList": [
+          "76561198029578060"
+        ],
+        "Name": "Joseph Elton",
+        "Nation": "GBR",
+        "Team": "Dude, where's my wang!?"
+      },
+      "RelPosition": {
+        "X": 0.08511992,
+        "Y": 0.055161923,
+        "Z": -1.8013011
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -399.91284,
+        "Y": 8.165169,
+        "Z": -23.454082
+      }
+    },
+    {
+      "CarId": 1,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198029578060",
+        "GuidsList": [
+          "76561198029578060"
+        ],
+        "Name": "Joseph Elton",
+        "Nation": "GBR",
+        "Team": "Dude, where's my wang!?"
+      },
+      "ImpactSpeed": 8.236634,
+      "OtherCarId": 0,
+      "OtherDriver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198020046073",
+        "GuidsList": [
+          "76561198020046073"
+        ],
+        "Name": "Callum Jones",
+        "Nation": "ABW",
+        "Team": "Wrong Bizniz Racing"
+      },
+      "RelPosition": {
+        "X": 0.000051155686,
+        "Y": 0.016862316,
+        "Z": 2.3042321
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -399.6576,
+        "Y": 8.121042,
+        "Z": -27.576544
+      }
+    },
+    {
+      "CarId": 0,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198020046073",
+        "GuidsList": [
+          "76561198020046073"
+        ],
+        "Name": "Callum Jones",
+        "Nation": "ABW",
+        "Team": "Wrong Bizniz Racing"
+      },
+      "ImpactSpeed": 8.118366,
+      "OtherCarId": 1,
+      "OtherDriver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198029578060",
+        "GuidsList": [
+          "76561198029578060"
+        ],
+        "Name": "Joseph Elton",
+        "Nation": "GBR",
+        "Team": "Dude, where's my wang!?"
+      },
+      "RelPosition": {
+        "X": 0.86961764,
+        "Y": -0.083581954,
+        "Z": -1.4814748
+      },
+      "Type": "COLLISION_WITH_CAR",
+      "WorldPosition": {
+        "X": -397.64288,
+        "Y": 7.8052597,
+        "Z": -57.841644
+      }
+    },
+    {
+      "CarId": 0,
+      "Driver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "76561198020046073",
+        "GuidsList": [
+          "76561198020046073"
+        ],
+        "Name": "Callum Jones",
+        "Nation": "ABW",
+        "Team": "Wrong Bizniz Racing"
+      },
+      "ImpactSpeed": 53.927273,
+      "OtherCarId": -1,
+      "OtherDriver": {
+        "ClassID": "00000000-0000-0000-0000-000000000000",
+        "Guid": "",
+        "GuidsList": null,
+        "Name": "",
+        "Nation": "",
+        "Team": ""
+      },
+      "RelPosition": {
+        "X": 0.8610587,
+        "Y": 0.30175006,
+        "Z": -1.4951773
+      },
+      "Type": "COLLISION_WITH_ENV",
+      "WorldPosition": {
+        "X": -379.29007,
+        "Y": 6.671806,
+        "Z": -116.009415
+      }
+    }
+  ],
+  "Laps": [
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "CarModel": "rss_formula_rss_4",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "Cuts": 0,
+      "DriverGuid": "76561198020046073",
+      "DriverName": "Callum Jones",
+      "LapTime": 64529,
+      "Restrictor": 0,
+      "Sectors": [
+        25366,
+        18959,
+        20204
+      ],
+      "Timestamp": 530041,
+      "Tyre": "S"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "CarModel": "rss_formula_rss_4",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "Cuts": 0,
+      "DriverGuid": "76561198029578060",
+      "DriverName": "Joseph Elton",
+      "LapTime": 64621,
+      "Restrictor": 0,
+      "Sectors": [
+        25062,
+        19890,
+        19669
+      ],
+      "Timestamp": 530136,
+      "Tyre": "S"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "CarModel": "rss_formula_rss_4",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "Cuts": 0,
+      "DriverGuid": "76561198029578060",
+      "DriverName": "Joseph Elton",
+      "LapTime": 70385,
+      "Restrictor": 0,
+      "Sectors": [
+        30776,
+        19958,
+        19651
+      ],
+      "Timestamp": 600518,
+      "Tyre": "S"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "CarModel": "rss_formula_rss_4",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "Cuts": 0,
+      "DriverGuid": "76561198020046073",
+      "DriverName": "Callum Jones",
+      "LapTime": 72263,
+      "Restrictor": 0,
+      "Sectors": [
+        30531,
+        20911,
+        20821
+      ],
+      "Timestamp": 602305,
+      "Tyre": "S"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "CarModel": "rss_formula_rss_4",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "Cuts": 0,
+      "DriverGuid": "76561198029578060",
+      "DriverName": "Joseph Elton",
+      "LapTime": 57521,
+      "Restrictor": 0,
+      "Sectors": [
+        19892,
+        18131,
+        19498
+      ],
+      "Timestamp": 658038,
+      "Tyre": "S"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "CarModel": "rss_formula_rss_4",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "Cuts": 0,
+      "DriverGuid": "76561198020046073",
+      "DriverName": "Callum Jones",
+      "LapTime": 60194,
+      "Restrictor": 0,
+      "Sectors": [
+        20676,
+        18711,
+        20807
+      ],
+      "Timestamp": 662498,
+      "Tyre": "S"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "CarModel": "rss_formula_rss_4",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "Cuts": 0,
+      "DriverGuid": "76561198029578060",
+      "DriverName": "Joseph Elton",
+      "LapTime": 71836,
+      "Restrictor": 0,
+      "Sectors": [
+        20208,
+        25938,
+        25690
+      ],
+      "Timestamp": 729870,
+      "Tyre": "S"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 0,
+      "CarModel": "rss_formula_rss_4",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "Cuts": 0,
+      "DriverGuid": "76561198020046073",
+      "DriverName": "Callum Jones",
+      "LapTime": 68938,
+      "Restrictor": 0,
+      "Sectors": [
+        21180,
+        21177,
+        26581
+      ],
+      "Timestamp": 731438,
+      "Tyre": "S"
+    },
+    {
+      "BallastKG": 0,
+      "CarId": 1,
+      "CarModel": "rss_formula_rss_4",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "Cuts": 0,
+      "DriverGuid": "76561198029578060",
+      "DriverName": "Joseph Elton",
+      "LapTime": 99478,
+      "Restrictor": 0,
+      "Sectors": [
+        62501,
+        17767,
+        19210
+      ],
+      "Timestamp": 829347,
+      "Tyre": "S"
+    }
+  ],
+  "RaceWeekendID": "",
+  "Result": [
+    {
+      "BallastKG": 0,
+      "BestLap": 57521,
+      "CarId": 1,
+      "CarModel": "rss_formula_rss_4",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "Disqualified": false,
+      "DriverGuid": "76561198029578060",
+      "DriverName": "Joseph Elton",
+      "HasPenalty": false,
+      "LapPenalty": 0,
+      "PenaltyTime": 0,
+      "Restrictor": 0,
+      "TotalTime": 363829
+    },
+    {
+      "BallastKG": 0,
+      "BestLap": 60194,
+      "CarId": 0,
+      "CarModel": "rss_formula_rss_4",
+      "ClassID": "00000000-0000-0000-0000-000000000000",
+      "Disqualified": false,
+      "DriverGuid": "76561198020046073",
+      "DriverName": "Callum Jones",
+      "HasPenalty": false,
+      "LapPenalty": 0,
+      "PenaltyTime": 0,
+      "Restrictor": 0,
+      "TotalTime": 265925
+    }
+  ],
+  "SessionFile": "2019_2_15_21_16_RACE",
+  "TrackConfig": "",
+  "TrackName": "barbagallo",
+  "Type": "RACE"
+}

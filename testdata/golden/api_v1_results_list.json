@@ -1,0 +1,17 @@
+[
+  {
+    "date": "0001-01-01T00:00:00Z",
+    "file": "2019_3_2_22_28_RACE.json",
+    "type": "RACE"
+  },
+  {
+    "date": "0001-01-01T00:00:00Z",
+    "file": "2019_3_2_22_15_QUALIFY.json",
+    "type": "QUALIFY"
+  },
+  {
+    "date": "0001-01-01T00:00:00Z",
+    "file": "2019_3_2_22_3_RACE.json",
+    "type": "RACE"
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "go_version": "\u003cgo_version\u003e",
+  "is_running": true,
+  "max_clients": 32,
+  "now": "0001-01-01T00:00:00Z",
+  "num_drivers": 0,
+  "ok": true,
+  "os": "\u003cos\u003e",
+  "server_name": "Test Server",
+  "session_type": "",
+  "track": "spa",
+  "track_layout": "grand_prix",
+  "uptime": "\u003cuptime\u003e",
+  "version": "\u003cversion\u003e"
+}
