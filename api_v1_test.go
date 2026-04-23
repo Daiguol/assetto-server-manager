@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -13,6 +14,38 @@ import (
 
 	"github.com/JustaPenguin/assetto-server-manager/internal/testutil"
 )
+
+// restoreResultFixtures re-copies fixtures/results/*.json into
+// ServerInstallPath/results so the golden tests see pristine input even
+// after TestChampionshipManager_* has mutated the working copy in the
+// same test binary run.
+func restoreResultFixtures(t *testing.T) {
+	t.Helper()
+
+	src := filepath.Join("fixtures", "results")
+	dst := filepath.Join(ServerInstallPath, "results")
+
+	if err := os.MkdirAll(dst, 0o755); err != nil {
+		t.Fatalf("mkdir %s: %v", dst, err)
+	}
+
+	entries, err := os.ReadDir(src)
+	if err != nil {
+		t.Fatalf("read %s: %v", src, err)
+	}
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		data, err := os.ReadFile(filepath.Join(src, e.Name()))
+		if err != nil {
+			t.Fatalf("read %s: %v", e.Name(), err)
+		}
+		if err := os.WriteFile(filepath.Join(dst, e.Name()), data, 0o644); err != nil {
+			t.Fatalf("write %s: %v", e.Name(), err)
+		}
+	}
+}
 
 // withChiURLParam stuffs a chi URL parameter into the request context so
 // chi.URLParam works in tests that bypass the router.
@@ -119,6 +152,7 @@ func TestAPIv1_ListCustomRaces(t *testing.T) {
 
 func TestAPIv1_ListResults(t *testing.T) {
 	ServerInstallPath = filepath.Join("cmd", "server-manager", "assetto")
+	restoreResultFixtures(t)
 
 	h := newAPIv1TestHandler(t, dummyServerProcess{})
 	got := doAPIRequest(t, h.listResults, http.MethodGet, "/api/v1/results?limit=3")
@@ -128,6 +162,7 @@ func TestAPIv1_ListResults(t *testing.T) {
 
 func TestAPIv1_GetResult(t *testing.T) {
 	ServerInstallPath = filepath.Join("cmd", "server-manager", "assetto")
+	restoreResultFixtures(t)
 
 	h := newAPIv1TestHandler(t, dummyServerProcess{})
 

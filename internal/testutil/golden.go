@@ -10,6 +10,7 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -57,8 +58,11 @@ func CompareGoldenJSON(t *testing.T, name string, got []byte) {
 	}
 }
 
-// volatileFields are JSON keys whose values change between runs and must be
-// stamped to a sentinel before comparison.
+// volatileFields are JSON keys (compared case-insensitively) whose values
+// change between runs and must be stamped to a sentinel before comparison.
+// Case-insensitive because the codebase mixes PascalCase field names on
+// raw structs (SessionResults.Date) with snake_case json tags on API
+// shapes (apiServerState.now).
 var volatileFields = map[string]any{
 	"now":        "0001-01-01T00:00:00Z",
 	"updated":    "0001-01-01T00:00:00Z",
@@ -82,7 +86,7 @@ func walk(v any) {
 	switch t := v.(type) {
 	case map[string]any:
 		for k, child := range t {
-			if sentinel, ok := volatileFields[k]; ok {
+			if sentinel, ok := volatileFields[strings.ToLower(k)]; ok {
 				t[k] = sentinel
 				continue
 			}
