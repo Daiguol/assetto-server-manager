@@ -161,7 +161,7 @@ func addEntrantsToChampionshipEvents(rs Store) error {
 
 	for _, c := range championships {
 		for _, event := range c.Events {
-			if event.EntryList == nil || len(event.EntryList) == 0 {
+			if len(event.EntryList) == 0 {
 				event.EntryList = c.AllEntrants()
 			}
 		}

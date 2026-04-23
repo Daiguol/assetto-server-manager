@@ -1022,7 +1022,6 @@ func (ch *ChampionshipsHandler) duplicateEvent(w http.ResponseWriter, r *http.Re
 	}
 }
 
-
 // apiChampionshipEvents returns all events of a championship as JSON.
 // GET /api/championship/{championshipID}/events
 func (ch *ChampionshipsHandler) apiChampionshipEvents(w http.ResponseWriter, r *http.Request) {
@@ -1103,8 +1102,8 @@ func (ch *ChampionshipsHandler) apiListChampionships(w http.ResponseWriter, r *h
 	}
 
 	type championshipDTO struct {
-		ID       string `json:"id"`
-		Name     string `json:"name"`
+		ID       string  `json:"id"`
+		Name     string  `json:"name"`
 		Progress float64 `json:"progress"`
 	}
 

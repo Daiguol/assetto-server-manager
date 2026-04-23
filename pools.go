@@ -47,8 +47,8 @@ func NewPoolsHandler(base *BaseHandler, store Store, carManager *CarManager, tra
 
 type poolsListTemplateVars struct {
 	BaseTemplateVars
-	Pools        []*TrackCarPool
-	PoolUsedBy   map[uuid.UUID][]string // poolID → championship names
+	Pools      []*TrackCarPool
+	PoolUsedBy map[uuid.UUID][]string // poolID → championship names
 }
 
 type poolEditTemplateVars struct {

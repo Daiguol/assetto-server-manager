@@ -468,19 +468,19 @@ func BuildCalObject(scheduled []ScheduledEvent, calendarObjects []CalendarObject
 					}
 					return carList(scheduledEvent.GetRaceSetup().Cars) + ": " + scheduledEvent.ReadOnlyEntryList().Entrants()
 				}(),
-				URL:               pageURL,
-				SignUpURL:         signUpURL,
-				ClassNames:        classNames,
-				Editable:          false,
-				StartEditable:     false,
-				DurationEditable:  false,
-				ResourceEditable:  false,
-				Rendering:         "",
-				Overlap:           true,
-				Constraint:        "",
-				BackgroundColor:   backgroundColor,
-				BorderColor:       borderColor,
-				TextColor:         textColor,
+				URL:              pageURL,
+				SignUpURL:        signUpURL,
+				ClassNames:       classNames,
+				Editable:         false,
+				StartEditable:    false,
+				DurationEditable: false,
+				ResourceEditable: false,
+				Rendering:        "",
+				Overlap:          true,
+				Constraint:       "",
+				BackgroundColor:  backgroundColor,
+				BorderColor:      borderColor,
+				TextColor:        textColor,
 			})
 		}
 	}

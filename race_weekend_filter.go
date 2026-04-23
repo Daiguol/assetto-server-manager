@@ -89,9 +89,7 @@ func reverseEntrants(numToReverse int, entrants []*RaceWeekendSessionEntrant) {
 		toReverse[i], toReverse[opp] = toReverse[opp], toReverse[i]
 	}
 
-	for i := 0; i < len(toReverse); i++ {
-		entrants[i] = toReverse[i]
-	}
+	copy(entrants, toReverse)
 }
 
 var ErrRaceWeekendUnknownSplitType = errors.New("servermanager: unknown split type")
