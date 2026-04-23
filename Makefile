@@ -24,6 +24,13 @@ test:
 	cp -R fixtures/results/*.json cmd/server-manager/assetto/results
 	go test -race
 
+coverage:
+	mkdir -p cmd/server-manager/assetto/cfg
+	mkdir -p cmd/server-manager/assetto/results
+	cp -R fixtures/results/*.json cmd/server-manager/assetto/results
+	go test ./... -coverprofile=coverage.out -covermode=atomic
+	@go tool cover -func=coverage.out | tail -1
+
 vet: install-linter
 	go vet ./...
 	golangci-lint run ./...
