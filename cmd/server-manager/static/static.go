@@ -10,7 +10,11 @@ import (
 	"path/filepath"
 )
 
-//go:embed css img js favicon.ico
+// The "all:" prefix keeps the .gitkeep placeholders in css/ and js/
+// countable so the embed compiles on a fresh checkout — both directories
+// are populated by "make assets" and empty in git.
+//
+//go:embed all:css all:img all:js favicon.ico
 var embedded embed.FS
 
 // FS returns the static assets as an http.FileSystem. When useLocal is true,

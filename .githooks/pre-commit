@@ -11,6 +11,14 @@ if [ -z "$STAGED_GO" ]; then
 	exit 0
 fi
 
+# make install-linter drops the binary in GOPATH/bin, which isn't always on
+# PATH inside the restricted hook shell. Add it so command -v finds it.
+if command -v go >/dev/null 2>&1; then
+	GOBIN_PATH=$(go env GOBIN)
+	[ -z "$GOBIN_PATH" ] && GOBIN_PATH=$(go env GOPATH)/bin
+	PATH="$GOBIN_PATH:$PATH"
+fi
+
 echo "pre-commit: go vet"
 go vet ./...
 
