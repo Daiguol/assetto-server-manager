@@ -8,8 +8,12 @@ export GO111MODULE=on
 
 all: clean vet test assets build
 
+GOLANGCI_LINT_VERSION := v1.64.8
+
 install-linter:
-	which golangci-lint || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.27.0
+	@if ! golangci-lint version 2>/dev/null | grep -q "$(patsubst v%,%,$(GOLANGCI_LINT_VERSION))"; then \
+		go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION); \
+	fi
 
 clean:
 	$(MAKE) -C cmd/server-manager clean
@@ -22,7 +26,7 @@ test:
 
 vet: install-linter
 	go vet ./...
-	golangci-lint -E bodyclose,misspell,gofmt,golint,unconvert,goimports,depguard,interfacer run --timeout 30m --skip-files content_cars_skins.go,plugin_kissmyrank_config.go,plugin_realpenalty_config.go
+	golangci-lint run ./...
 
 assets:
 	$(MAKE) -C cmd/server-manager assets

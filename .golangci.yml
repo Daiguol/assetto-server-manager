@@ -1,0 +1,51 @@
+# golangci-lint config — v1.64+
+# Linter baseline for the fork. Additions beyond upstream's original set:
+#   - errcheck, staticcheck, gosimple, ineffassign
+# Removed from upstream:
+#   - golint (replaced by revive)
+#   - interfacer (abandoned upstream, no replacement)
+#   - depguard (no policy defined; re-enable with explicit rules when needed)
+# Deferred (enable in a later phase, each requires a batch cleanup commit):
+#   - gofumpt (≈1000 format nits)
+#   - gocritic (style rewrites, mostly ifElseChain)
+# Known debt silenced via exclude-rules: SA1019 (deprecated stdlib).
+
+run:
+  timeout: 5m
+
+linters:
+  disable-all: true
+  enable:
+    - bodyclose
+    - errcheck
+    - gofmt
+    - goimports
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - revive
+    - staticcheck
+    - unconvert
+
+linters-settings:
+  revive:
+    rules:
+      # Interface implementations often carry unused params as part of the
+      # interface contract. Too noisy for a solo-maintained fork.
+      - name: unused-parameter
+        disabled: true
+
+issues:
+  exclude-files:
+    - content_cars_skins.go
+    - plugin_kissmyrank_config.go
+    - plugin_realpenalty_config.go
+  exclude-rules:
+    # Deprecated stdlib APIs (io/ioutil, strings.Title, rand.Seed) used
+    # throughout the codebase. Tracked in docs/ROADMAP.md for a dedicated
+    # cleanup phase.
+    - linters: [staticcheck]
+      text: "SA1019"
+  max-issues-per-linter: 0
+  max-same-issues: 0
