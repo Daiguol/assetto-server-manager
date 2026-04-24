@@ -43,7 +43,9 @@ type ChampionshipsConfig struct {
 }
 
 type MonitoringConfig struct {
-	Enabled bool `yaml:"enabled"`
+	Enabled     bool   `yaml:"enabled"`
+	SentryDSN   string `yaml:"sentry_dsn"`
+	SentryJSDSN string `yaml:"sentry_js_dsn"`
 }
 
 type AccountsConfig struct {

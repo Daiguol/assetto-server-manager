@@ -4,17 +4,14 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"time"
 
-	"github.com/getsentry/raven-go"
+	sentry "github.com/getsentry/sentry-go"
+	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
-)
-
-const (
-	sentryDSN   = "https://d8325490c2fa49b58cd9b557aed9ce8a@sentry.justapengu.in/4"
-	sentryJSDSN = "https://9153aa91818949c7a70708d0f0566faf@sentry.justapengu.in/5"
 )
 
 var (
@@ -40,19 +37,28 @@ var (
 	}
 )
 
+// InitMonitoring wires Sentry (if a DSN is configured) and Prometheus. The
+// previous implementation hard-coded a DSN pointing at JustaPenguin's Sentry,
+// so any fork with monitoring.enabled: true silently shipped stack traces to
+// a third party. The DSN is now read from config; empty DSN = no Sentry
+// client, which is the safe default for this fork.
 func InitMonitoring() {
-	logrus.Infof("initialising Raven monitoring")
-	err := raven.SetDSN(sentryDSN)
-
-	if err != nil {
-		logrus.WithError(err).Error("could not initialise raven monitoring")
-	}
-
-	raven.SetRelease(BuildVersion)
-
-	panicHandler = raven.Recoverer
-	panicCapture = func(fn func()) {
-		raven.CapturePanic(fn, nil)
+	if dsn := config.Monitoring.SentryDSN; dsn != "" {
+		logrus.Infof("initialising Sentry monitoring")
+		err := sentry.Init(sentry.ClientOptions{
+			Dsn:     dsn,
+			Release: BuildVersion,
+		})
+		if err != nil {
+			logrus.WithError(err).Error("could not initialise sentry")
+		} else {
+			sentryHandler := sentryhttp.New(sentryhttp.Options{Repanic: true})
+			panicHandler = sentryHandler.Handle
+			panicCapture = func(fn func()) {
+				defer sentry.Recover()
+				fn()
+			}
+		}
 	}
 
 	http.DefaultTransport = RoundTripper(http.DefaultTransport)
@@ -70,6 +76,12 @@ func InitMonitoring() {
 			),
 		)
 	}
+}
+
+// FlushMonitoring blocks up to 2s to drain any pending Sentry events. Safe
+// to call unconditionally: if Sentry was never initialised it's a no-op.
+func FlushMonitoring() {
+	sentry.Flush(2 * time.Second)
 }
 
 var httpInFlightRequests = prometheus.NewGauge(prometheus.GaugeOpts{

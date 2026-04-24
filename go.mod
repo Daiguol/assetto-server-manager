@@ -16,7 +16,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/etcd-io/bbolt v1.3.3
 	github.com/fatih/color v1.7.0
-	github.com/getsentry/raven-go v0.2.0
+	github.com/getsentry/sentry-go v0.31.1
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-http-utils/etag v0.0.0-20161124023236-513ea8f21eb1
 	github.com/google/uuid v1.1.1
@@ -40,7 +40,7 @@ require (
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73
 	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
-	golang.org/x/text v0.3.2
+	golang.org/x/text v0.14.0
 	gopkg.in/yaml.v2 v2.2.7
 )
 
@@ -52,7 +52,6 @@ require (
 	github.com/blevesearch/blevex v0.0.0-20180227211930-4b158bb555a3 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.2 // indirect
 	github.com/blevesearch/segment v0.0.0-20160915185041-762005e7a34f // indirect
-	github.com/certifi/gocertifi v0.0.0-20200104152315-a6d78f326758 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/couchbase/vellum v0.0.0-20190829182332-ef2e028c01fd // indirect
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
@@ -77,7 +76,6 @@ require (
 	github.com/mschoch/smat v0.0.0-20160514031455-90eadee771ae // indirect
 	github.com/olekukonko/tablewriter v0.0.4 // indirect
 	github.com/philhofer/fwd v1.0.0 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.9.1 // indirect
 	github.com/prometheus/procfs v0.0.8 // indirect
@@ -92,7 +90,7 @@ require (
 	github.com/willf/bitset v1.1.10 // indirect
 	github.com/yosssi/gohtml v0.0.0-20200519115854-476f5b4b8047 // indirect
 	go.etcd.io/bbolt v1.3.2 // indirect
-	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	gopkg.in/ini.v1 v1.42.0 // indirect
 )
 

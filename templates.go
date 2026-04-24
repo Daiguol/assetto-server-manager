@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/sprig"
-	"github.com/getsentry/raven-go"
+	sentry "github.com/getsentry/sentry-go"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/mattn/go-zglob"
@@ -593,7 +593,7 @@ func (tr *Renderer) addData(w http.ResponseWriter, r *http.Request, vars Templat
 	data.Request = r
 	data.Debug = Debug
 	data.MonitoringEnabled = config.Monitoring.Enabled
-	data.SentryDSN = sentryJSDSN
+	data.SentryDSN = template.JSStr(config.Monitoring.SentryJSDSN)
 	data.RecaptchaSiteKey = config.Championships.RecaptchaConfig.SiteKey
 	data.BaseURLIsSet = baseURLIsSet()
 	data.BaseURLIsValid = baseURLIsValid()
@@ -662,7 +662,7 @@ func (tr *Renderer) MustLoadTemplate(w http.ResponseWriter, r *http.Request, vie
 	if err != nil {
 		if _, ok := err.(*net.OpError); !ok {
 			// don't capture OpErrors, they flood sentry with non-errors
-			raven.CaptureError(err, nil)
+			sentry.CaptureException(err)
 		}
 		logrus.WithError(err).Errorf("Unable to load template: %s", view)
 		http.Error(w, "unable to load template", http.StatusInternalServerError)
