@@ -1,8 +1,8 @@
 deps:
-	npm install
+	npm ci --no-audit --no-fund
 
 build: deps
-	./node_modules/.bin/gulp build
+	npm run build
 
 watch: deps
-	./node_modules/.bin/gulp
+	npm run watch
