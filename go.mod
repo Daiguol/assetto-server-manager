@@ -2,11 +2,10 @@ module github.com/JustaPenguin/assetto-server-manager
 
 require (
 	4d63.com/tz v1.1.0
-	github.com/Clinet/discordgo-embed v0.0.0-20190411043415-d754bc1a576c
 	github.com/Masterminds/semver v1.5.0
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/blevesearch/bleve v0.8.1
-	github.com/bwmarrin/discordgo v0.20.2
+	github.com/bwmarrin/discordgo v0.29.0
 	github.com/cj123/caldav-go v0.0.0-20191202141705-5d30c27975e9
 	github.com/cj123/formulate v0.0.0-20200906120731-1cd9cd8fdf1d
 	github.com/cj123/ini v1.44.0
@@ -20,7 +19,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-http-utils/etag v0.0.0-20161124023236-513ea8f21eb1
 	github.com/google/uuid v1.1.1
-	github.com/gorilla/websocket v1.4.1
+	github.com/gorilla/websocket v1.4.2
 	github.com/haisum/recaptcha v0.0.0-20170327142240-7d3b8053900e
 	github.com/hako/durafmt v0.0.0-20191009132224-3f39dc1ed9f4
 	github.com/jaytaylor/html2text v0.0.0-20190408195923-01ec452cbe43
@@ -37,8 +36,8 @@ require (
 	github.com/solovev/steam_go v0.0.0-20170222182106-48eb5aae6c50
 	github.com/teambition/rrule-go v1.5.0
 	github.com/yuin/gopher-lua v0.0.0-20191220021717-ab39c6098bdb
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-	golang.org/x/net v0.0.0-20200904194848-62affa334b73
+	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b
+	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
 	golang.org/x/text v0.14.0
 	gopkg.in/yaml.v2 v2.2.7

@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	embed "github.com/Clinet/discordgo-embed"
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -43,6 +42,13 @@ func NewDiscordManager(store Store, scheduledRacesManager *ScheduledRacesManager
 		session, err = discordgo.New("Bot " + opts.DiscordAPIToken)
 
 		if err == nil {
+			// Roles (CommandNotify) need GuildMembers, CommandHandler dispatches on
+			// m.Content which requires MessageContent (enable the toggle in the
+			// Discord Developer Portal too — it's a server-side check).
+			session.Identify.Intents = discordgo.IntentsGuildMembers |
+				discordgo.IntentsGuildMessages |
+				discordgo.IntentsMessageContent
+
 			err = session.Open()
 		}
 
@@ -76,6 +82,10 @@ func (dm *DiscordManager) SaveServerOptions(oldServerOpts *GlobalServerConfig, n
 		session, err := discordgo.New("Bot " + newServerOpts.DiscordAPIToken)
 
 		if err == nil {
+			session.Identify.Intents = discordgo.IntentsGuildMembers |
+				discordgo.IntentsGuildMessages |
+				discordgo.IntentsMessageContent
+
 			err = session.Open()
 		}
 
@@ -326,12 +336,15 @@ func (dm *DiscordManager) SendMessage(title string, msg string) error {
 				mention := fmt.Sprintf("Attention <@&%s> - %s\n", opts.DiscordRoleID, title)
 				messageSend := &discordgo.MessageSend{
 					Content: mention,
-					Embed:   embed.NewEmbed().SetDescription(msg).SetColor(0x1c1c1c).MessageEmbed,
+					Embed:   &discordgo.MessageEmbed{Description: msg, Color: 0x1c1c1c},
 				}
 				_, err = dm.discord.ChannelMessageSendComplex(opts.DiscordChannelID, messageSend)
 			} else {
-
-				_, err = dm.discord.ChannelMessageSendEmbed(opts.DiscordChannelID, embed.NewGenericEmbed(title, msg))
+				_, err = dm.discord.ChannelMessageSendEmbed(opts.DiscordChannelID, &discordgo.MessageEmbed{
+					Title:       title,
+					Description: msg,
+					Color:       0x1c1c1c,
+				})
 			}
 
 			if err != nil {
@@ -370,12 +383,15 @@ func (dm *DiscordManager) SendMessageWithLink(title string, msg string, linkText
 			mention := fmt.Sprintf("Attention <@&%s> - %s\n", opts.DiscordRoleID, title)
 			messageSend := &discordgo.MessageSend{
 				Content: mention,
-				Embed:   embed.NewEmbed().SetDescription(msg + "\n" + linkMsg).SetColor(0x1c1c1c).MessageEmbed,
+				Embed:   &discordgo.MessageEmbed{Description: msg + "\n" + linkMsg, Color: 0x1c1c1c},
 			}
 			_, err = dm.discord.ChannelMessageSendComplex(opts.DiscordChannelID, messageSend)
 		} else {
-
-			_, err = dm.discord.ChannelMessageSendEmbed(opts.DiscordChannelID, embed.NewGenericEmbed(title, msg+"\n"+linkMsg))
+			_, err = dm.discord.ChannelMessageSendEmbed(opts.DiscordChannelID, &discordgo.MessageEmbed{
+				Title:       title,
+				Description: msg + "\n" + linkMsg,
+				Color:       0x1c1c1c,
+			})
 		}
 
 		if err != nil {
