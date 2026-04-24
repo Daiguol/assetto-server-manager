@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/sirupsen/logrus"
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/solovev/steam_go"
 )
 

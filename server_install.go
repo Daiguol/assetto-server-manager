@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 )
 
 // assettoServerSteamID is the ID of the server on steam.

@@ -17,8 +17,8 @@ import (
 	"sync"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
-	"github.com/sirupsen/logrus"
 )
 
 const MaxLogSizeBytes = 1e6

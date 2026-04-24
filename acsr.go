@@ -14,7 +14,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/sirupsen/logrus"
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 )
 
 var acsrURL = "https://acsr.assettocorsaservers.com"

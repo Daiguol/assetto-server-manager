@@ -18,12 +18,12 @@ import (
 	"sync"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/Masterminds/sprig"
 	sentry "github.com/getsentry/sentry-go"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/mattn/go-zglob"
-	"github.com/sirupsen/logrus"
 )
 
 // BuildVersion is the time Server Manager was built at

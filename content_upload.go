@@ -12,8 +12,8 @@ import (
 	"regexp"
 	"strings"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 )
 
 type ContentType string

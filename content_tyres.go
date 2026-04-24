@@ -12,8 +12,8 @@ import (
 
 	"github.com/JustaPenguin/assetto-server-manager/pkg/acd"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/cj123/ini"
-	"github.com/sirupsen/logrus"
 )
 
 var tyreFiles = []string{

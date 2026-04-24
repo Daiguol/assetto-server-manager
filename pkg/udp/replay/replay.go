@@ -10,8 +10,8 @@ import (
 
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/etcd-io/bbolt"
-	"github.com/sirupsen/logrus"
 )
 
 type Entries []*Entry

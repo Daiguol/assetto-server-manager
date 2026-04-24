@@ -8,7 +8,7 @@ import (
 
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 
-	"github.com/sirupsen/logrus"
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 )
 
 func NewRaceControlDriver(carInfo udp.SessionCarInfo) *RaceControlDriver {

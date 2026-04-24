@@ -8,11 +8,11 @@ import (
 	"net/url"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/cj123/caldav-go/icalendar"
 	"github.com/cj123/caldav-go/icalendar/components"
 	"github.com/cj123/caldav-go/icalendar/values"
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 	"github.com/teambition/rrule-go"
 )
 

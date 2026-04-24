@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/sirupsen/logrus"
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 )
 
 // kissmyrank handles configuration of the kissmyrank plugin

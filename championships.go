@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 )
 
 // ChampionshipClassColors are sequentially selected to indicate different classes within a Championship

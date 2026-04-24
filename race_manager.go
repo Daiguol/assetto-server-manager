@@ -17,10 +17,10 @@ import (
 	"github.com/JustaPenguin/assetto-server-manager/pkg/when"
 
 	"4d63.com/tz"
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/etcd-io/bbolt"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 )
 
 var ErrCustomRaceNotFound = errors.New("servermanager: custom race not found")

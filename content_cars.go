@@ -19,12 +19,12 @@ import (
 	"sync"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/search/query"
 	"github.com/cj123/watcher"
 	"github.com/dimchansky/utfbom"
 	"github.com/go-chi/chi/v5"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
 

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
 
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 )

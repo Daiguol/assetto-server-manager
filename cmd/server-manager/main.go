@@ -16,11 +16,11 @@ import (
 	"github.com/JustaPenguin/assetto-server-manager/internal/changelog"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
 	"github.com/lorenzosaino/go-sysctl"
 	"github.com/pkg/browser"
-	"github.com/sirupsen/logrus"
 )
 
 var defaultAddress = "0.0.0.0:8772"

@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/cj123/ini"
 	"github.com/go-chi/chi/v5"
-	"github.com/sirupsen/logrus"
 )
 
 // CarSetups is a map of car name to the setups for that car.

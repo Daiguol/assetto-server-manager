@@ -1,4 +1,5 @@
 // this file was automatically generated using struct2ts github.com/JustaPenguin/assetto-server-manager.RaceControl
+//go:build ignore
 // +build ignore
 
 package main

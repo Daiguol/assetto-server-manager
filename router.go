@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/cj123/sessions"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-http-utils/etag"
-	"github.com/sirupsen/logrus"
 )
 
 var (

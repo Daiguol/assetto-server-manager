@@ -15,6 +15,7 @@ import (
 	"sync"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/when"
 	"github.com/cj123/caldav-go/icalendar"
@@ -22,7 +23,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/haisum/recaptcha"
-	"github.com/sirupsen/logrus"
 )
 
 type ChampionshipManager struct {

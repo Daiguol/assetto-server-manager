@@ -11,7 +11,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"golang.org/x/text/encoding/unicode/utf32"
 )
 

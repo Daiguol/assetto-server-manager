@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 	"github.com/go-chi/chi/v5"
-	"github.com/sirupsen/logrus"
 )
 
 // APIv1Handler exposes a stable JSON API for external integrations such as the

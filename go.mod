@@ -32,7 +32,6 @@ require (
 	github.com/prometheus/client_golang v1.3.0
 	github.com/russross/blackfriday v2.0.0+incompatible
 	github.com/sethvargo/go-diceware v0.2.0
-	github.com/sirupsen/logrus v1.4.2
 	github.com/solovev/steam_go v0.0.0-20170222182106-48eb5aae6c50
 	github.com/teambition/rrule-go v1.5.0
 	github.com/yuin/gopher-lua v0.0.0-20191220021717-ab39c6098bdb
@@ -65,7 +64,6 @@ require (
 	github.com/huandu/xstrings v1.3.0 // indirect
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/jmhodges/levigo v1.0.0 // indirect
-	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.10 // indirect
 	github.com/mattn/go-runewidth v0.0.8 // indirect

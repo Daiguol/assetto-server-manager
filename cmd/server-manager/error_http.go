@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"strings"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/pkg/browser"
-	"github.com/sirupsen/logrus"
 )
 
 type HTTPErrorHandler struct {

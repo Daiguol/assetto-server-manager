@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/cj123/sessions"
 	"github.com/etcd-io/bbolt"
-	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 

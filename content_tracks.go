@@ -19,12 +19,12 @@ import (
 
 	"github.com/JustaPenguin/assetto-server-manager/cmd/server-manager/static"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/cj123/ini"
 	"github.com/dimchansky/utfbom"
 	"github.com/go-chi/chi/v5"
 	"github.com/jpillora/longestcommon"
 	"github.com/nfnt/resize"
-	"github.com/sirupsen/logrus"
 )
 
 type Track struct {

@@ -10,7 +10,7 @@ import (
 
 	servermanager "github.com/JustaPenguin/assetto-server-manager"
 
-	"github.com/sirupsen/logrus"
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 )
 
 var raceOutFile string

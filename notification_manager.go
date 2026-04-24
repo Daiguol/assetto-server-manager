@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/hako/durafmt"
-	"github.com/sirupsen/logrus"
 )
 
 type NotificationDispatcher interface {

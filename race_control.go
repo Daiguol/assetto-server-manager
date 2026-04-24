@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/google/uuid"
 	"github.com/mitchellh/go-wordwrap"
-	"github.com/sirupsen/logrus"
 	lua "github.com/yuin/gopher-lua"
 
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"

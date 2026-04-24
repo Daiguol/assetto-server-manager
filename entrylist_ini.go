@@ -9,9 +9,9 @@ import (
 	"sort"
 	"strings"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/cj123/ini"
 	"github.com/google/uuid"
-	"github.com/sirupsen/logrus"
 )
 
 const (

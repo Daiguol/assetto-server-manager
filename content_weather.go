@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/cj123/ini"
 	"github.com/go-chi/chi/v5"
-	"github.com/sirupsen/logrus"
 )
 
 const weatherInfoFile = "weather.ini"

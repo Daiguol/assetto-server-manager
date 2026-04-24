@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
+	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/cj123/ini"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/net/html"
 )
 
