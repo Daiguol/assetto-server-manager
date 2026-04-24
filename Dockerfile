@@ -3,26 +3,22 @@
 # -----------------------------------------------------------------------------
 # Stage 1: Frontend assets
 #
-# Node 14 is the last version compatible with node-sass@4 (still a dep until the
-# frontend-modernization phase). This stage is isolated so the legacy toolchain
-# never leaks into the runtime image.
+# Vite + Dart Sass + TypeScript 5 — pure JS toolchain, no native compile step.
+# Alpine keeps the image slim; .npmrc pins legacy-peer-deps + ignore-scripts so
+# bootstrap-switch/summernote quirks don't break the install.
 # -----------------------------------------------------------------------------
-FROM node:14-bullseye-slim AS assets
+FROM node:20-alpine AS assets
 
 WORKDIR /src/cmd/server-manager/typescript
 
-RUN apt-get update \
- && apt-get install -y --no-install-recommends python3 build-essential \
- && rm -rf /var/lib/apt/lists/*
-ENV PYTHON=/usr/bin/python3
-
 COPY cmd/server-manager/typescript/package.json \
      cmd/server-manager/typescript/package-lock.json \
+     cmd/server-manager/typescript/.npmrc \
      ./
-RUN npm install --no-audit --no-fund
+RUN npm ci
 
 COPY cmd/server-manager/typescript/ ./
-RUN ./node_modules/.bin/gulp build
+RUN npm run build
 
 
 # -----------------------------------------------------------------------------
