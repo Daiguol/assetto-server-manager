@@ -3,11 +3,16 @@
 # -----------------------------------------------------------------------------
 # Stage 1: Frontend assets
 #
-# Vite + Dart Sass + TypeScript 5 — pure JS toolchain, no native compile step.
-# Alpine keeps the image slim; .npmrc pins legacy-peer-deps + ignore-scripts so
-# bootstrap-switch/summernote quirks don't break the install.
+# Vite + Dart Sass + TypeScript 5 — 100% JS toolchain, no native compile step,
+# so alpine (musl libc) is safe. `lts-alpine` floats with the active Node LTS
+# and the latest stable Alpine — LTS bumps only happen every ~2 years, so the
+# tag is stable in practice. Stage discarded after build, image size matters
+# mostly for first-pull speed.
+#
+# .npmrc pins legacy-peer-deps + ignore-scripts so bootstrap-switch/summernote
+# quirks don't break the install.
 # -----------------------------------------------------------------------------
-FROM node:20-alpine AS assets
+FROM node:lts-alpine AS assets
 
 WORKDIR /src/cmd/server-manager/typescript
 
