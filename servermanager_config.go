@@ -10,7 +10,7 @@ import (
 
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/cj123/sessions"
-	"github.com/etcd-io/bbolt"
+	"go.etcd.io/bbolt"
 	"gopkg.in/yaml.v2"
 )
 

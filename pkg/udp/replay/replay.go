@@ -11,7 +11,7 @@ import (
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
-	"github.com/etcd-io/bbolt"
+	"go.etcd.io/bbolt"
 )
 
 type Entries []*Entry

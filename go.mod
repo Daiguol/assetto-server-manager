@@ -13,7 +13,6 @@ require (
 	github.com/cj123/watcher v1.0.9
 	github.com/dimchansky/utfbom v1.1.0
 	github.com/dustin/go-humanize v1.0.0
-	github.com/etcd-io/bbolt v1.3.3
 	github.com/fatih/color v1.7.0
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/go-chi/chi/v5 v5.2.5
@@ -35,6 +34,7 @@ require (
 	github.com/solovev/steam_go v0.0.0-20170222182106-48eb5aae6c50
 	github.com/teambition/rrule-go v1.5.0
 	github.com/yuin/gopher-lua v0.0.0-20191220021717-ab39c6098bdb
+	go.etcd.io/bbolt v1.3.2
 	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
@@ -54,6 +54,7 @@ require (
 	github.com/couchbase/vellum v0.0.0-20190829182332-ef2e028c01fd // indirect
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
+	github.com/etcd-io/bbolt v1.3.3 // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/glycerine/go-unsnap-stream v0.0.0-20190901134440-81cf024a9e0a // indirect
 	github.com/go-http-utils/fresh v0.0.0-20161124030543-7231e26a4b27 // indirect
@@ -86,7 +87,6 @@ require (
 	github.com/tinylib/msgp v1.1.1 // indirect
 	github.com/willf/bitset v1.1.10 // indirect
 	github.com/yosssi/gohtml v0.0.0-20200519115854-476f5b4b8047 // indirect
-	go.etcd.io/bbolt v1.3.2 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	gopkg.in/ini.v1 v1.42.0 // indirect
 )
