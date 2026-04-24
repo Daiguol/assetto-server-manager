@@ -28,17 +28,17 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
-	github.com/prometheus/client_golang v1.3.0
+	github.com/prometheus/client_golang v1.23.2
 	github.com/russross/blackfriday v2.0.0+incompatible
 	github.com/sethvargo/go-diceware v0.2.0
 	github.com/solovev/steam_go v0.0.0-20170222182106-48eb5aae6c50
 	github.com/teambition/rrule-go v1.5.0
 	github.com/yuin/gopher-lua v0.0.0-20191220021717-ab39c6098bdb
 	go.etcd.io/bbolt v1.3.2
-	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b
-	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
-	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
-	golang.org/x/text v0.14.0
+	golang.org/x/crypto v0.41.0
+	golang.org/x/net v0.43.0
+	golang.org/x/sync v0.16.0
+	golang.org/x/text v0.28.0
 	gopkg.in/yaml.v2 v2.2.7
 )
 
@@ -50,7 +50,7 @@ require (
 	github.com/blevesearch/blevex v0.0.0-20180227211930-4b158bb555a3 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.2 // indirect
 	github.com/blevesearch/segment v0.0.0-20160915185041-762005e7a34f // indirect
-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/couchbase/vellum v0.0.0-20190829182332-ef2e028c01fd // indirect
 	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
@@ -59,7 +59,7 @@ require (
 	github.com/glycerine/go-unsnap-stream v0.0.0-20190901134440-81cf024a9e0a // indirect
 	github.com/go-http-utils/fresh v0.0.0-20161124030543-7231e26a4b27 // indirect
 	github.com/go-http-utils/headers v0.0.0-20181008091004-fed159eddc2a // indirect
-	github.com/golang/protobuf v1.3.2 // indirect
+	github.com/golang/protobuf v1.5.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/huandu/xstrings v1.3.0 // indirect
@@ -68,15 +68,15 @@ require (
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.10 // indirect
 	github.com/mattn/go-runewidth v0.0.8 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
 	github.com/mschoch/smat v0.0.0-20160514031455-90eadee771ae // indirect
+	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/olekukonko/tablewriter v0.0.4 // indirect
 	github.com/philhofer/fwd v1.0.0 // indirect
-	github.com/prometheus/client_model v0.2.0 // indirect
-	github.com/prometheus/common v0.9.1 // indirect
-	github.com/prometheus/procfs v0.0.8 // indirect
+	github.com/prometheus/client_model v0.6.2 // indirect
+	github.com/prometheus/common v0.66.1 // indirect
+	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/smartystreets/assertions v0.0.0-20190215210624-980c5ac6f3ac // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190306220146-200a235640ff // indirect
@@ -87,8 +87,10 @@ require (
 	github.com/tinylib/msgp v1.1.1 // indirect
 	github.com/willf/bitset v1.1.10 // indirect
 	github.com/yosssi/gohtml v0.0.0-20200519115854-476f5b4b8047 // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	go.yaml.in/yaml/v2 v2.4.2 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	google.golang.org/protobuf v1.36.8 // indirect
 	gopkg.in/ini.v1 v1.42.0 // indirect
 )
 
-go 1.23
+go 1.23.0
