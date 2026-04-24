@@ -1,6 +1,6 @@
-# golangci-lint config — v1.64+
+# golangci-lint config — v2.11+
 # Linter baseline for the fork. Additions beyond upstream's original set:
-#   - errcheck, staticcheck, gosimple, ineffassign
+#   - errcheck, staticcheck, ineffassign
 # Removed from upstream:
 #   - golint (replaced by revive)
 #   - interfacer (abandoned upstream, no replacement)
@@ -8,44 +8,74 @@
 # Deferred (enable in a later phase, each requires a batch cleanup commit):
 #   - gofumpt (≈1000 format nits)
 #   - gocritic (style rewrites, mostly ifElseChain)
-# Known debt silenced via exclude-rules: SA1019 (deprecated stdlib).
+# Known debt silenced via exclusions.rules: SA1019 (deprecated stdlib).
+# Note: gosimple was merged into staticcheck in v2; gofmt/goimports moved to
+# the top-level `formatters:` section.
 
-run:
-  timeout: 5m
+version: "2"
 
 linters:
-  disable-all: true
+  default: none
   enable:
     - bodyclose
     - errcheck
-    - gofmt
-    - goimports
-    - gosimple
     - govet
     - ineffassign
     - misspell
     - revive
     - staticcheck
     - unconvert
-
-linters-settings:
-  revive:
+  settings:
+    revive:
+      rules:
+        # Interface implementations often carry unused params as part of the
+        # interface contract. Too noisy for a solo-maintained fork.
+        - name: unused-parameter
+          disabled: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
     rules:
-      # Interface implementations often carry unused params as part of the
-      # interface contract. Too noisy for a solo-maintained fork.
-      - name: unused-parameter
-        disabled: true
+      # Deprecated stdlib APIs (io/ioutil, strings.Title, rand.Seed) used
+      # throughout the codebase. Tracked in docs/ROADMAP.md for a dedicated
+      # cleanup phase.
+      - linters:
+          - staticcheck
+        text: SA1019
+      # staticcheck v2 enables a new "quick fix" category (QF1001-QF1012)
+      # covering style rewrites: De Morgan's law, strings.ReplaceAll,
+      # time.Time.Equal, tagged switches, etc. Opinionated and unrelated to
+      # correctness. Silenced to keep the v1→v2 migration a pure toolchain
+      # change. Can be opted into file-by-file in a later cleanup phase.
+      - linters:
+          - staticcheck
+        text: "^QF"
+    paths:
+      - content_cars_skins.go
+      - plugin_kissmyrank_config.go
+      - plugin_realpenalty_config.go
+      - third_party$
+      - builtin$
+      - examples$
 
 issues:
-  exclude-files:
-    - content_cars_skins.go
-    - plugin_kissmyrank_config.go
-    - plugin_realpenalty_config.go
-  exclude-rules:
-    # Deprecated stdlib APIs (io/ioutil, strings.Title, rand.Seed) used
-    # throughout the codebase. Tracked in docs/ROADMAP.md for a dedicated
-    # cleanup phase.
-    - linters: [staticcheck]
-      text: "SA1019"
   max-issues-per-linter: 0
   max-same-issues: 0
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - content_cars_skins.go
+      - plugin_kissmyrank_config.go
+      - plugin_realpenalty_config.go
+      - third_party$
+      - builtin$
+      - examples$
