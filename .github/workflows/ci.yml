@@ -27,9 +27,6 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      # Stays on v6 (Node 20) because v7+ only supports golangci-lint v2+,
-      # and we're still on v1.64.8. Bump in tandem when we migrate to
-      # golangci-lint v2 (new config schema, separate phase).
-      - uses: golangci/golangci-lint-action@v6
+      - uses: golangci/golangci-lint-action@v8
         with:
-          version: v1.64.8
+          version: v2.11.4
