@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -178,4 +179,73 @@ func TestAPIv1_GetResult(t *testing.T) {
 	}
 
 	testutil.CompareGoldenJSON(t, "api_v1_result_detail", rec.Body.Bytes())
+}
+
+// Edge cases — no golden, just status + error message assertions.
+
+func TestAPIv1_ListResults_BadParams(t *testing.T) {
+	ServerInstallPath = filepath.Join("cmd", "server-manager", "assetto")
+	restoreResultFixtures(t)
+
+	h := newAPIv1TestHandler(t, dummyServerProcess{})
+
+	cases := []struct {
+		name    string
+		query   string
+		wantMsg string
+	}{
+		{name: "since not numeric", query: "since=abc", wantMsg: "invalid 'since'"},
+		{name: "limit not numeric", query: "limit=abc", wantMsg: "invalid 'limit'"},
+		{name: "limit zero", query: "limit=0", wantMsg: "invalid 'limit'"},
+		{name: "limit over 500", query: "limit=501", wantMsg: "invalid 'limit'"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/results?"+tc.query, nil)
+			rec := httptest.NewRecorder()
+			h.listResults(rec, req)
+
+			if rec.Code != http.StatusBadRequest {
+				t.Fatalf("status = %d, want %d. body = %s", rec.Code, http.StatusBadRequest, rec.Body.String())
+			}
+			if !strings.Contains(rec.Body.String(), tc.wantMsg) {
+				t.Errorf("body %q does not contain %q", rec.Body.String(), tc.wantMsg)
+			}
+		})
+	}
+}
+
+func TestAPIv1_GetResult_EdgeCases(t *testing.T) {
+	ServerInstallPath = filepath.Join("cmd", "server-manager", "assetto")
+	restoreResultFixtures(t)
+
+	h := newAPIv1TestHandler(t, dummyServerProcess{})
+
+	cases := []struct {
+		name     string
+		file     string
+		wantCode int
+		wantMsg  string
+	}{
+		{name: "empty file", file: "", wantCode: http.StatusBadRequest, wantMsg: "missing file name"},
+		{name: "path traversal", file: "../etc/passwd", wantCode: http.StatusBadRequest, wantMsg: "invalid file name"},
+		{name: "not found", file: "does_not_exist.json", wantCode: http.StatusNotFound, wantMsg: "result not found"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/results/x", nil)
+			req = withChiURLParam(req, "file", tc.file)
+			rec := httptest.NewRecorder()
+			h.getResult(rec, req)
+
+			if rec.Code != tc.wantCode {
+				t.Fatalf("status = %d, want %d. body = %s", rec.Code, tc.wantCode, rec.Body.String())
+			}
+			if !strings.Contains(rec.Body.String(), tc.wantMsg) {
+				t.Errorf("body %q does not contain %q", rec.Body.String(), tc.wantMsg)
+			}
+		})
+	}
 }

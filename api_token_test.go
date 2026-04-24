@@ -81,6 +81,8 @@ func TestSplitCars(t *testing.T) {
 		{"car_one", []string{"car_one"}},
 		{"car_one;car_two;car_three", []string{"car_one", "car_two", "car_three"}},
 		{"car_one; car_two ;  ;car_three", []string{"car_one", "car_two", "car_three"}},
+		{"a;;b", []string{"a", "b"}},
+		{"a;b;", []string{"a", "b"}},
 	}
 
 	for _, tc := range cases {
