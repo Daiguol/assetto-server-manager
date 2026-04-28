@@ -697,6 +697,13 @@ func (cm *CarManager) rebuildTerm(term string) string {
 	term = positiveCarTypeRegex.ReplaceAllString(term, "$1:T*")
 	term = negativeCarTypeRegex.ReplaceAllString(term, "$1:F*")
 
+	// Append * so bare words become prefix queries: "hura" → "hura*"
+	// which matches "huracan". Skip if the term already contains
+	// Bleve special characters (wildcards, ranges, field operators).
+	if term != "" && !strings.ContainsAny(term, "*?:~^+- ") {
+		term = term + "*"
+	}
+
 	return term
 }
 
