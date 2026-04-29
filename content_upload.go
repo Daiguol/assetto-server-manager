@@ -192,7 +192,7 @@ func (cuh *ContentUploadHandler) imageUpload(w http.ResponseWriter, r *http.Requ
 	file, header, err := r.FormFile("image")
 
 	onError := func(err error, what string) {
-		logrus.WithError(err).Errorf(what)
+		logrus.WithError(err).Errorf("%s", what)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 

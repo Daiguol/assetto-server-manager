@@ -26,7 +26,6 @@ require (
 	github.com/lorenzosaino/go-sysctl v0.1.0
 	github.com/mattn/go-zglob v0.0.1
 	github.com/mitchellh/go-wordwrap v1.0.0
-	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
 	github.com/prometheus/client_golang v1.23.2
 	github.com/sethvargo/go-diceware v0.2.0
@@ -36,9 +35,10 @@ require (
 	github.com/yuin/gopher-lua v0.0.0-20191220021717-ab39c6098bdb
 	go.etcd.io/bbolt v1.3.2
 	golang.org/x/crypto v0.41.0
+	golang.org/x/image v0.39.0
 	golang.org/x/net v0.43.0
-	golang.org/x/sync v0.16.0
-	golang.org/x/text v0.28.0
+	golang.org/x/sync v0.20.0
+	golang.org/x/text v0.36.0
 	gopkg.in/yaml.v2 v2.2.7
 )
 
@@ -92,4 +92,4 @@ require (
 	gopkg.in/ini.v1 v1.42.0 // indirect
 )
 
-go 1.23.0
+go 1.25.0

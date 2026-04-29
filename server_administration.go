@@ -386,7 +386,7 @@ func (sah *ServerAdministrationHandler) serverProcess(w http.ResponseWriter, r *
 	}
 
 	if err != nil {
-		logrus.WithError(err).Errorf("could not change " + noun + " status")
+		logrus.WithError(err).Errorf("could not change %s status", noun)
 		AddErrorFlash(w, r, "Unable to change "+noun+" status")
 	} else {
 		AddFlash(w, r, noun+" successfully "+txt)

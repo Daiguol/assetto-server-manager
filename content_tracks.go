@@ -24,7 +24,7 @@ import (
 	"github.com/dimchansky/utfbom"
 	"github.com/go-chi/chi/v5"
 	"github.com/jpillora/longestcommon"
-	"github.com/nfnt/resize"
+	xdraw "golang.org/x/image/draw"
 )
 
 type Track struct {
@@ -516,9 +516,17 @@ func (tm *TrackManager) GetTrackImage(w io.Writer, track, layout string) (int64,
 	marginX, marginY := 10, 10
 
 	if trackMapBounds.Dx() > trackMapBounds.Dy() {
-		resizedMap = resize.Resize(uint(float64(trackImageBounds.Dx())/trackMapOverlayScale), 0, trackMap, resize.Bilinear)
+		dstW := int(float64(trackImageBounds.Dx()) / trackMapOverlayScale)
+		dstH := trackMapBounds.Dy() * dstW / trackMapBounds.Dx()
+		dst := image.NewNRGBA(image.Rect(0, 0, dstW, dstH))
+		xdraw.BiLinear.Scale(dst, dst.Bounds(), trackMap, trackMapBounds, draw.Over, nil)
+		resizedMap = dst
 	} else {
-		resizedMap = resize.Resize(0, uint(float64(trackImageBounds.Dy())/trackMapOverlayScale), trackMap, resize.Bilinear)
+		dstH := int(float64(trackImageBounds.Dy()) / trackMapOverlayScale)
+		dstW := trackMapBounds.Dx() * dstH / trackMapBounds.Dy()
+		dst := image.NewNRGBA(image.Rect(0, 0, dstW, dstH))
+		xdraw.BiLinear.Scale(dst, dst.Bounds(), trackMap, trackMapBounds, draw.Over, nil)
+		resizedMap = dst
 		marginX = 20
 		marginY = 20
 	}
