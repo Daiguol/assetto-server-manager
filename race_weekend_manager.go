@@ -14,10 +14,10 @@ import (
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/when"
-	"github.com/cj123/ini"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/mattn/go-zglob"
+	"gopkg.in/ini.v1"
 )
 
 type RaceWeekendManager struct {

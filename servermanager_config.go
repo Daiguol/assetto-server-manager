@@ -9,7 +9,7 @@ import (
 	"time"
 
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
-	"github.com/cj123/sessions"
+	"github.com/gorilla/sessions"
 	"go.etcd.io/bbolt"
 	"gopkg.in/yaml.v2"
 )

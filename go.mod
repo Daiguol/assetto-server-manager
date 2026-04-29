@@ -8,8 +8,6 @@ require (
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/cj123/caldav-go v0.0.0-20191202141705-5d30c27975e9
 	github.com/cj123/formulate v0.0.0-20200906120731-1cd9cd8fdf1d
-	github.com/cj123/ini v1.44.0
-	github.com/cj123/sessions v1.1.5
 	github.com/cj123/watcher v1.0.9
 	github.com/dimchansky/utfbom v1.1.0
 	github.com/dustin/go-humanize v1.0.0
@@ -18,6 +16,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-http-utils/etag v0.0.0-20161124023236-513ea8f21eb1
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/sessions v1.4.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/haisum/recaptcha v0.0.0-20170327142240-7d3b8053900e
 	github.com/hako/durafmt v0.0.0-20191009132224-3f39dc1ed9f4
@@ -39,6 +38,7 @@ require (
 	golang.org/x/net v0.43.0
 	golang.org/x/sync v0.20.0
 	golang.org/x/text v0.36.0
+	gopkg.in/ini.v1 v1.67.1
 	gopkg.in/yaml.v2 v2.2.7
 )
 
@@ -70,8 +70,7 @@ require (
 	github.com/go-http-utils/fresh v0.0.0-20161124030543-7231e26a4b27 // indirect
 	github.com/go-http-utils/headers v0.0.0-20181008091004-fed159eddc2a // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/gopherjs/gopherjs v0.0.0-20190910122728-9d188e94fb99 // indirect
-	github.com/gorilla/securecookie v1.1.1 // indirect
+	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/huandu/xstrings v1.3.0 // indirect
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -88,14 +87,11 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
-	github.com/smartystreets/assertions v0.0.0-20190215210624-980c5ac6f3ac // indirect
-	github.com/smartystreets/goconvey v0.0.0-20190306220146-200a235640ff // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/yosssi/gohtml v0.0.0-20200519115854-476f5b4b8047 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
-	gopkg.in/ini.v1 v1.42.0 // indirect
 )
 
 go 1.25.0

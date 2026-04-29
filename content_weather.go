@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
-	"github.com/cj123/ini"
 	"github.com/go-chi/chi/v5"
+	"gopkg.in/ini.v1"
 )
 
 const weatherInfoFile = "weather.ini"

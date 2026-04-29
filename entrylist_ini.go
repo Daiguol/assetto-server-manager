@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
-	"github.com/cj123/ini"
 	"github.com/google/uuid"
+	"gopkg.in/ini.v1"
 )
 
 const (
@@ -42,7 +42,7 @@ func (e EntryList) Write() error {
 		entrant.PitBox = i
 	}
 
-	f := ini.NewFile([]ini.DataSource{nil}, ini.LoadOptions{
+	f := ini.Empty(ini.LoadOptions{
 		IgnoreInlineComment: true,
 	})
 

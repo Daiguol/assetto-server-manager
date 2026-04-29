@@ -3,7 +3,7 @@ package servermanager
 import (
 	"path/filepath"
 
-	"github.com/cj123/ini"
+	"gopkg.in/ini.v1"
 )
 
 const (
@@ -61,7 +61,7 @@ type RealPenaltyAppConfig struct {
 }
 
 func (rpa *RealPenaltyAppConfig) write() error {
-	f := ini.NewFile([]ini.DataSource{nil}, ini.LoadOptions{
+	f := ini.Empty(ini.LoadOptions{
 		IgnoreInlineComment: true,
 	})
 
@@ -134,7 +134,7 @@ type RealPenaltySettings struct {
 }
 
 func (rps *RealPenaltySettings) write() error {
-	f := ini.NewFile([]ini.DataSource{nil}, ini.LoadOptions{
+	f := ini.Empty(ini.LoadOptions{
 		IgnoreInlineComment: true,
 	})
 
@@ -382,7 +382,7 @@ type RealPenaltyACSettings struct {
 }
 
 func (rpac *RealPenaltyACSettings) write() error {
-	f := ini.NewFile([]ini.DataSource{nil}, ini.LoadOptions{
+	f := ini.Empty(ini.LoadOptions{
 		IgnoreInlineComment: true,
 	})
 

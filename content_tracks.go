@@ -20,11 +20,11 @@ import (
 	"github.com/JustaPenguin/assetto-server-manager/cmd/server-manager/static"
 
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
-	"github.com/cj123/ini"
 	"github.com/dimchansky/utfbom"
 	"github.com/go-chi/chi/v5"
 	"github.com/jpillora/longestcommon"
 	xdraw "golang.org/x/image/draw"
+	"gopkg.in/ini.v1"
 )
 
 type Track struct {

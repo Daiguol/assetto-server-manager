@@ -15,8 +15,8 @@ import (
 	"time"
 
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
-	"github.com/cj123/ini"
 	"golang.org/x/net/html"
+	"gopkg.in/ini.v1"
 )
 
 // stracker handles configuration of the stracker plugin
@@ -163,7 +163,7 @@ type StrackerConfiguration struct {
 }
 
 func (stc *StrackerConfiguration) Write() error {
-	f := ini.NewFile([]ini.DataSource{nil}, ini.LoadOptions{
+	f := ini.Empty(ini.LoadOptions{
 		IgnoreInlineComment: true,
 	})
 

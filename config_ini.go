@@ -11,7 +11,7 @@ import (
 
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/cj123/formulate"
-	"github.com/cj123/ini"
+	"gopkg.in/ini.v1"
 )
 
 func init() {
@@ -77,7 +77,7 @@ func (sc ServerConfig) Write() error {
 	// overwrite server config
 	sc.GlobalServerConfig.WelcomeMessage = MOTDFilename
 
-	f := ini.NewFile([]ini.DataSource{nil}, ini.LoadOptions{
+	f := ini.Empty(ini.LoadOptions{
 		IgnoreInlineComment: true,
 	})
 

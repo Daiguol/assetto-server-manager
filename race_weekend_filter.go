@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
-	"github.com/cj123/ini"
 	"github.com/google/uuid"
+	"gopkg.in/ini.v1"
 )
 
 type FilterError string
@@ -209,7 +209,7 @@ func (rw *RaceWeekend) buildLockedTyreSetup(session *RaceWeekendSession, entrant
 	if setup == nil {
 		// no fixed setup was specified
 		// write out a temp ini setup file for this car + player.
-		setup = ini.NewFile([]ini.DataSource{nil}, ini.LoadOptions{
+		setup = ini.Empty(ini.LoadOptions{
 			IgnoreInlineComment: true,
 		})
 

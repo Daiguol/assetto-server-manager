@@ -15,9 +15,9 @@ import (
 
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/Masterminds/semver"
-	"github.com/cj123/sessions"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"github.com/gorilla/sessions"
 	"github.com/sethvargo/go-diceware/diceware"
 	"golang.org/x/crypto/scrypt"
 )
