@@ -8,7 +8,6 @@ require (
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/cj123/caldav-go v0.0.0-20191202141705-5d30c27975e9
 	github.com/cj123/formulate v0.0.0-20200906120731-1cd9cd8fdf1d
-	github.com/cj123/watcher v1.0.9
 	github.com/dimchansky/utfbom v1.1.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fatih/color v1.7.0
@@ -27,6 +26,7 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.0
 	github.com/pkg/browser v0.0.0-20180916011732-0a3d74bf9ce4
 	github.com/prometheus/client_golang v1.23.2
+	github.com/radovskyb/watcher v1.0.7
 	github.com/sethvargo/go-diceware v0.2.0
 	github.com/solovev/steam_go v0.0.0-20170222182106-48eb5aae6c50
 	github.com/teambition/rrule-go v1.5.0

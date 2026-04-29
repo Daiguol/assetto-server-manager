@@ -63,8 +63,6 @@ github.com/cj123/caldav-go v0.0.0-20191202141705-5d30c27975e9 h1:xZlbepPe910UkjX
 github.com/cj123/caldav-go v0.0.0-20191202141705-5d30c27975e9/go.mod h1:qZv/7clqXmcRq9V5WBnibPqGV9O4NBHDTYZ1Mg9XOvc=
 github.com/cj123/formulate v0.0.0-20200906120731-1cd9cd8fdf1d h1:2aRNId8JMLJv9wGWC1H9gwSZK4m8IYUh1qH97z7piNg=
 github.com/cj123/formulate v0.0.0-20200906120731-1cd9cd8fdf1d/go.mod h1:7ojWVfgO+BCeIot8tyOTING31yS4PmtfyPK2kQT2agE=
-github.com/cj123/watcher v1.0.9 h1:MmrpcW2QPxMsXfioURP4pXHrHlmSp1kWY+sVD/qd1no=
-github.com/cj123/watcher v1.0.9/go.mod h1:aAljpjOwMp4580IkJPtOlpOIC1dI8xIiWHErPu7YqIY=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -174,6 +172,8 @@ github.com/prometheus/common v0.66.1 h1:h5E0h5/Y8niHc5DlaLlWLArTQI7tMrsfQjHV+d9Z
 github.com/prometheus/common v0.66.1/go.mod h1:gcaUsgf3KfRSwHY4dIMXLPV0K/Wg1oZ8+SbZk/HH/dA=
 github.com/prometheus/procfs v0.16.1 h1:hZ15bTNuirocR6u0JZ6BAHHmwS1p8B4P6MRqxtzMyRg=
 github.com/prometheus/procfs v0.16.1/go.mod h1:teAbpZRB1iIAJYREa1LsoWUXykVXA1KlTmWl8x/U+Is=
+github.com/radovskyb/watcher v1.0.7 h1:AYePLih6dpmS32vlHfhCeli8127LzkIgwJGcwwe8tUE=
+github.com/radovskyb/watcher v1.0.7/go.mod h1:78okwvY5wPdzcb1UYnip1pvrZNIVEIh/Cm+ZuvsUYIg=
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/rogpeppe/go-internal v1.10.0/go.mod h1:UQnix2H7Ngw/k4C5ijL5+65zddjncjaFoBhdsK/akog=
 github.com/sethvargo/go-diceware v0.2.0 h1:3QzXGqUe0UR9y1XYSz1dxGS+fKtXOxRqqKjy+cG1yTI=

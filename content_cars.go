@@ -22,9 +22,9 @@ import (
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	bleve "github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/search/query"
-	"github.com/cj123/watcher"
 	"github.com/dimchansky/utfbom"
 	"github.com/go-chi/chi/v5"
+	"github.com/radovskyb/watcher"
 	"golang.org/x/sync/errgroup"
 )
 
