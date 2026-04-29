@@ -7,9 +7,9 @@ require (
 	github.com/blevesearch/bleve/v2 v2.5.7
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/cj123/caldav-go v0.0.0-20191202141705-5d30c27975e9
-	github.com/cj123/formulate v0.0.0-20200906120731-1cd9cd8fdf1d
 	github.com/dimchansky/utfbom v1.1.0
 	github.com/dustin/go-humanize v1.0.0
+	github.com/fatih/camelcase v1.0.0
 	github.com/fatih/color v1.7.0
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/go-chi/chi/v5 v5.2.5
@@ -30,6 +30,7 @@ require (
 	github.com/sethvargo/go-diceware v0.2.0
 	github.com/solovev/steam_go v0.0.0-20170222182106-48eb5aae6c50
 	github.com/teambition/rrule-go v1.5.0
+	github.com/yosssi/gohtml v0.0.0-20200519115854-476f5b4b8047
 	github.com/yuin/goldmark v1.8.2
 	github.com/yuin/gopher-lua v0.0.0-20191220021717-ab39c6098bdb
 	go.etcd.io/bbolt v1.4.0
@@ -66,7 +67,6 @@ require (
 	github.com/blevesearch/zapx/v15 v15.4.2 // indirect
 	github.com/blevesearch/zapx/v16 v16.2.8 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/go-http-utils/fresh v0.0.0-20161124030543-7231e26a4b27 // indirect
 	github.com/go-http-utils/headers v0.0.0-20181008091004-fed159eddc2a // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -88,7 +88,6 @@ require (
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
-	github.com/yosssi/gohtml v0.0.0-20200519115854-476f5b4b8047 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect

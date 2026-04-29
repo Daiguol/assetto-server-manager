@@ -9,8 +9,8 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/JustaPenguin/assetto-server-manager/internal/formulate"
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
-	"github.com/cj123/formulate"
 	"gopkg.in/ini.v1"
 )
 

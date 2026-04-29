@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/cj123/formulate"
+	"github.com/JustaPenguin/assetto-server-manager/internal/formulate"
 )
 
 func DefaultKissMyRankConfig() *KissMyRankConfig {

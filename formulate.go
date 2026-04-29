@@ -9,8 +9,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/cj123/formulate"
-	"github.com/cj123/formulate/decorators"
+	"github.com/JustaPenguin/assetto-server-manager/internal/formulate"
+	"github.com/JustaPenguin/assetto-server-manager/internal/formulate/decorators"
 	"golang.org/x/net/html"
 )
 
