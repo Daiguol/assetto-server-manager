@@ -9,9 +9,7 @@ import (
 	"time"
 
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
-	"github.com/cj123/caldav-go/icalendar"
-	"github.com/cj123/caldav-go/icalendar/components"
-	"github.com/cj123/caldav-go/icalendar/values"
+	ics "github.com/arran4/golang-ical"
 	"github.com/google/uuid"
 	"github.com/teambition/rrule-go"
 )
@@ -31,41 +29,38 @@ type ScheduledEvent interface {
 	ClearRecurrenceRule()
 }
 
-func BuildICalEvent(event ScheduledEvent) *components.Event {
-	icalEvent := components.NewEvent(event.GetID().String(), event.GetScheduledTime().UTC())
+func BuildICalEvent(cal *ics.Calendar, event ScheduledEvent) {
+	e := cal.AddEvent(event.GetID().String())
+	e.SetStartAt(event.GetScheduledTime().UTC())
 
 	if champEvent, ok := event.(*ChampionshipEvent); ok && champEvent.IsSecret() {
-		icalEvent.Summary = "Secret Event " + event.GetSummary()
+		e.SetSummary("Secret Event " + event.GetSummary())
 		if config.HTTP.BaseURL != "" {
-			if u, err := url.Parse(config.HTTP.BaseURL + event.GetURL()); err == nil {
-				icalEvent.Url = values.NewUrl(*u)
+			if _, err := url.Parse(config.HTTP.BaseURL + event.GetURL()); err == nil {
+				e.SetURL(config.HTTP.BaseURL + event.GetURL())
 			}
 		}
-		return icalEvent
+		return
 	}
 
 	raceSetup := event.GetRaceSetup()
+	tInfo := trackInfo(raceSetup.Track, raceSetup.TrackLayout)
 
-	trackInfo := trackInfo(raceSetup.Track, raceSetup.TrackLayout)
-
-	if trackInfo == nil {
-		icalEvent.Summary = "Race at " + prettifyName(raceSetup.Track, false)
-
+	var summary string
+	if tInfo == nil {
+		summary = "Race at " + prettifyName(raceSetup.Track, false)
 		if raceSetup.TrackLayout != "" {
-			icalEvent.Summary += fmt.Sprintf(" (%s)", prettifyName(raceSetup.TrackLayout, true))
+			summary += fmt.Sprintf(" (%s)", prettifyName(raceSetup.TrackLayout, true))
 		}
 	} else {
-		icalEvent.Summary = fmt.Sprintf("Race at %s, %s, %s", trackInfo.Name, trackInfo.City, trackInfo.Country)
-		icalEvent.Location = values.NewLocation(fmt.Sprintf("%s, %s", trackInfo.City, trackInfo.Country))
+		summary = fmt.Sprintf("Race at %s, %s, %s", tInfo.Name, tInfo.City, tInfo.Country)
+		e.SetLocation(fmt.Sprintf("%s, %s", tInfo.City, tInfo.Country))
 	}
-
-	icalEvent.Summary += " " + event.GetSummary()
+	e.SetSummary(summary + " " + event.GetSummary())
 
 	if config.HTTP.BaseURL != "" {
-		u, err := url.Parse(config.HTTP.BaseURL + event.GetURL())
-
-		if err == nil {
-			icalEvent.Url = values.NewUrl(*u)
+		if _, err := url.Parse(config.HTTP.BaseURL + event.GetURL()); err == nil {
+			e.SetURL(config.HTTP.BaseURL + event.GetURL())
 		}
 	}
 
@@ -75,23 +70,21 @@ func BuildICalEvent(event ScheduledEvent) *components.Event {
 	for _, session := range raceSetup.Sessions.AsSlice() {
 		if session.Time > 0 {
 			sessionDuration := time.Minute * time.Duration(session.Time)
-
 			totalDuration += sessionDuration
 			description += fmt.Sprintf("%s: %s\n", session.Name, sessionDuration.String())
 		} else if session.Laps > 0 {
 			description += fmt.Sprintf("%s: %d laps\n", session.Name, session.Laps)
-			totalDuration += time.Minute * 30 // just add a 30 min buffer so it shows in the calendar
+			totalDuration += time.Minute * 30
 		}
 	}
 
 	entryList := event.ReadOnlyEntryList()
-
 	description += fmt.Sprintf("\n%d entrants in: %s", len(entryList), carList(entryList))
+	e.SetDescription(description)
 
-	icalEvent.Description = description
-	icalEvent.Duration = values.NewDuration(totalDuration)
-
-	return icalEvent
+	if totalDuration > 0 {
+		e.SetEndAt(event.GetScheduledTime().UTC().Add(totalDuration))
+	}
 }
 
 type ScheduledRacesHandler struct {
@@ -244,21 +237,13 @@ func (srm *ScheduledRacesManager) buildScheduledRaces(w io.Writer) error {
 		return err
 	}
 
-	cal := components.NewCalendar()
+	cal := ics.NewCalendar()
 
 	for _, event := range scheduled {
-		icalEvent := BuildICalEvent(event)
-
-		cal.Events = append(cal.Events, icalEvent)
+		BuildICalEvent(cal, event)
 	}
 
-	str, err := icalendar.Marshal(cal)
-
-	if err != nil {
-		return err
-	}
-
-	_, err = fmt.Fprint(w, str)
+	_, err = fmt.Fprint(w, cal.Serialize())
 
 	return err
 }

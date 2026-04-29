@@ -18,8 +18,7 @@ import (
 	logrus "github.com/JustaPenguin/assetto-server-manager/internal/logrus"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/udp"
 	"github.com/JustaPenguin/assetto-server-manager/pkg/when"
-	"github.com/cj123/caldav-go/icalendar"
-	"github.com/cj123/caldav-go/icalendar/components"
+	ics "github.com/arran4/golang-ical"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/haisum/recaptcha"
@@ -1736,7 +1735,7 @@ func (cm *ChampionshipManager) BuildICalFeed(championshipID string, w io.Writer)
 		return err
 	}
 
-	cal := components.NewCalendar()
+	cal := ics.NewCalendar()
 
 	for _, event := range championship.Events {
 		if event.Scheduled.IsZero() {
@@ -1745,18 +1744,10 @@ func (cm *ChampionshipManager) BuildICalFeed(championshipID string, w io.Writer)
 
 		event.championship = championship
 
-		icalEvent := BuildICalEvent(event)
-
-		cal.Events = append(cal.Events, icalEvent)
+		BuildICalEvent(cal, event)
 	}
 
-	str, err := icalendar.Marshal(cal)
-
-	if err != nil {
-		return err
-	}
-
-	_, err = fmt.Fprint(w, str)
+	_, err = fmt.Fprint(w, cal.Serialize())
 
 	return err
 }

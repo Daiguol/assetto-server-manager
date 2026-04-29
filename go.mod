@@ -4,9 +4,9 @@ require (
 	4d63.com/tz v1.1.0
 	github.com/Masterminds/semver v1.5.0
 	github.com/Masterminds/sprig v2.22.0+incompatible
+	github.com/arran4/golang-ical v0.3.5
 	github.com/blevesearch/bleve/v2 v2.5.7
 	github.com/bwmarrin/discordgo v0.29.0
-	github.com/cj123/caldav-go v0.0.0-20191202141705-5d30c27975e9
 	github.com/dimchansky/utfbom v1.1.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fatih/camelcase v1.0.0
