@@ -54,10 +54,6 @@
 
                 gtag('config', 'UA-85378001-6');
             </script>
-            <script src="https://cdn.ravenjs.com/3.26.2/raven.min.js" crossorigin="anonymous"></script>
-            <script>
-                Raven.config({{ $.SentryDSN }}).install();
-            </script>
         {{ end }}
     </head>
     <body {{ with $.User }}class="user-group-{{ $.User.Group }}"{{ end }}>
